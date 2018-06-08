@@ -7,6 +7,7 @@ const fs = require('fs'),
   dbConfig = require('../../config/db')[config.environment],
   db = {};
 
+// logger.info('\n\nDatabase info: ' +dbConfig.database + ' ' + dbConfig.username + ' ' +dbConfig.password+ ' ' + dbConfig);
 const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, dbConfig);
 
 fs
