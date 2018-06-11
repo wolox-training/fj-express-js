@@ -22,11 +22,7 @@ module.exports = {
       email: {
         type: DataTypes.TEXT,
         allowNull: false,
-        unique: true,
-        validate: {
-          isEmail: true,
-          contains: '@wolox.com.ar'
-        }
+        unique: true
       },
       password: {
         type: DataTypes.TEXT,

@@ -1,6 +1,8 @@
 'use strict';
 
-const logger = require('../logger');
+const logger = require('../logger'),
+  bcrypt = require('bcryptjs'),
+  errors = require('../errors');
 
 // User Model, including validation and corresponding error messages.
 module.exports = (sequelize, DataTypes) => {
@@ -69,10 +71,11 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = models => {
     // associations can be defined here
   };
+
   // Creates a new user model and adds to database. Returns promise.
-  User.createModel = user => {
+  User.createNewUser = user => {
     return User.create(user).catch(err => {
-      logger.info(`ERROR MESSAGE: ${err.message}`);
+      throw errors.savingError(err.detail);
     });
   };
 
