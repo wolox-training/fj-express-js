@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: {
         args: false,
-        msg: 'YThe last name field cannot be empty, please try again.'
+        msg: 'The last name field cannot be empty, please try again.'
       },
       notEmpty: {
         msg: 'The last name field cannot be empty, please try again.'
@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: {
         args: false,
-        msg: 'The password field cannot be empty, please try again.'
+        msg: 'The email field cannot be empty, please try again.'
       },
       notEmpty: {
         msg: 'The email field cannot be empty, please try again.'
@@ -51,20 +51,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.TEXT,
-      allowNull: false,
-      validate: {
-        isAlphanumeric: {
-          msg:
-            'The password can only be comprised of alphanumeric characters, please pick a different password.'
-        },
-        len: {
-          args: [8],
-          msg: 'The password must be at least 8 characters long, please pick a different password.'
-        },
-        notEmpty: {
-          msg: 'The password field cannot be empty, please try again.'
-        }
-      }
+      allowNull: false
     }
   });
 
@@ -75,7 +62,7 @@ module.exports = (sequelize, DataTypes) => {
   // Creates a new user model and adds to database. Returns promise.
   User.createNewUser = user => {
     return User.create(user).catch(err => {
-      throw errors.savingError(err.detail);
+      throw errors.savingError(err.message);
     });
   };
 

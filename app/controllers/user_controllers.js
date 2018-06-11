@@ -4,7 +4,8 @@ const logger = require('../logger'),
   bcrypt = require('bcryptjs'),
   validator = require('validator'),
   errors = require('../errors'),
-  User = require('../models').Users;
+  User = require('../models').Users,
+  saltRounds = 10;
 
 const validateUser = user => {
   let errorMsg = '';
@@ -22,7 +23,7 @@ const validateUser = user => {
     // Invalid email error
     errorMsg += 'Email is not a valid email and/or not in the @wolox.com.ar domain.\n';
   }
-    if (!user.email || user.email.length <= 0) {
+  if (!user.email || user.email.length <= 0) {
     // Email must be given
     errorMsg += 'Email cannot be empty.\n';
   }
@@ -40,7 +41,9 @@ exports.returnUsers = (req, res, next) => {
     x => {
       res.send(x);
     },
-    y => {}
+    y => {
+      res.send(y);
+    }
   );
 };
 
@@ -59,22 +62,23 @@ exports.buildUser = (req, res, next) => {
   let valMsg = validateUser(newUser);
   if (valMsg.length > 0) {
     valMsg = valMsg.slice(0, -1);
-    res.send(valMsg);
+    // res.send(valMsg);
+    next(errors.defaultError(valMsg));
+  } else {
+    User.create(newUser).then(
+      result => {
+        res.send(`Successfully logged in. Welcome, ${result.firstName} ${result.lastName}!`);
+      },
+      e => {
+        let err = '';
+        e.errors.forEach(error => {
+          logger.info(error.message);
+          err += `${error.message}\n`;
+        });
+        next(errors.savingError(err));
+      }
+    );
   }
-
-  User.create(newUser).then(
-    result => {
-      res.send(`Successfully logged in. Welcome, ${result.firstName} ${result.lastName}!`);
-    },
-    e => {
-      let errorMessage = '';
-      e.errors.forEach(error => {
-        logger.info(error.message);
-        errorMessage += `* ${error.message}\n`;
-      });
-      res.send(errorMessage);
-    }
-  );
 };
 
 exports.newUser = (req, res, next) => {
@@ -82,28 +86,31 @@ exports.newUser = (req, res, next) => {
     ? {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        password: bcrypt.hash(req.body.password),
+        password: req.body.password,
         email: req.body.email
       }
     : {};
 
-  validateUser(newUser, req, res, next);
+  let valMsg = validateUser(newUser);
+  if (valMsg.length > 0) {
+    valMsg = valMsg.slice(0, -1);
+    next(errors.defaultError(valMsg));
+  } else {
+    bcrypt
+      .hash(newUser.password, saltRounds)
+      .then(hash => {
+        newUser.password = hash;
 
-  bcrypt
-    .hash(newUser.password)
-    .then(hash => {
-      newUser.password = hash;
-
-      User.createNewUser(newUser)
-        .then(u => {
-          res.status(200);
-          res.end();
-        })
-        .catch(err => {
-          next(err);
-        });
-    })
-    .catch(err => {
-      next(errors.defaultError(err));
-    });
+        User.createNewUser(newUser)
+          .then(u => {
+            res.send(`Successfully logged in. Welcome, ${u.firstName} ${u.lastName}!`);
+          })
+          .catch(err => {
+            next(err);
+          });
+      })
+      .catch(err => {
+        next(errors.defaultError(err));
+      });
+  }
 };

@@ -6,36 +6,29 @@ module.exports = {
     return queryInterface.createTable('Users', {
       id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: true,
         autoIncrement: true,
+        allowNull: false,
         primaryKey: true
       },
       firstName: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false
       },
       lastName: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false
       },
       email: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true
       },
       password: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false
       },
-      createdAt: {
-        allowNull: false,
-        type: DataTypes.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: DataTypes.DATE
-      }
+      createdAt: DataTypes.DATE,
+      updatedAt: DataTypes.DATE
     });
   },
   down: (queryInterface, Sequelize) => {
