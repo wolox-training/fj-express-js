@@ -1,14 +1,13 @@
 'use strict';
 
 const logger = require('../logger'),
-  bcrypt = require('bcryptjs'),
   errors = require('../errors');
 
 // User Model, including validation and corresponding error messages.
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('Users', {
     firstName: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: {
         args: false,
         msg: 'The first name field cannot be empty, please try again.'
@@ -18,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     lastName: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: {
         args: false,
         msg: 'The last name field cannot be empty, please try again.'
@@ -28,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     email: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: {
         args: false,
         msg: 'The email field cannot be empty, please try again.'
@@ -50,14 +49,10 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     password: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false
     }
   });
-
-  User.associate = models => {
-    // associations can be defined here
-  };
 
   // Creates a new user model and adds to database. Returns promise.
   User.createNewUser = user => {
@@ -67,9 +62,7 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   // Returns an array of all users.
-  User.getAll = user => {
-    return User.findAll().then(array => array);
-  };
+  User.getAll = user => User.findAll().then(array => array);
 
   User.getAllWhere = options => {
     return User.findAll({

@@ -9,7 +9,6 @@ const statusCodes = {
   [errors.SAVING_ERROR]: 400,
   [errors.DATABASE_ERROR]: 503,
   [errors.DEFAULT_ERROR]: 500
-  // [errors.NEW_USER_ERROR]: 400
 };
 
 exports.handle = (error, req, res, next) => {
