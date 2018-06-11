@@ -2,8 +2,8 @@
 
 // User migration
 module.exports = {
-  up: (queryInterface, DataTypes) => {
-    return queryInterface.createTable('Users', {
+  up: (queryInterface, DataTypes) =>
+    queryInterface.createTable('Users', {
       id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -40,9 +40,6 @@ module.exports = {
         allowNull: false,
         type: DataTypes.DATE
       }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Users');
-  }
+    }),
+  down: (queryInterface, Sequelize) => queryInterface.dropTable('Users')
 };

@@ -1,38 +1,39 @@
 'use strict';
 
-const logger = require('../logger');
+const errors = require('../errors');
 
-// User Model, including validation and corresponding error messages.
+const emptyValidation = field => `The ${field} field cannot be empty. Please try again.`;
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('Users', {
     firstName: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: {
         args: false,
-        msg: 'The first name field cannot be empty, please try again.'
+        msg: emptyValidation('First Name')
       },
       notEmpty: {
-        msg: 'The first name field cannot be empty, please try again.'
+        msg: emptyValidation('First Name')
       }
     },
     lastName: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: {
         args: false,
-        msg: 'YThe last name field cannot be empty, please try again.'
+        msg: emptyValidation('Last Name')
       },
       notEmpty: {
-        msg: 'The last name field cannot be empty, please try again.'
+        msg: emptyValidation('Last Name')
       }
     },
     email: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: {
         args: false,
-        msg: 'The password field cannot be empty, please try again.'
+        msg: emptyValidation('Email')
       },
       notEmpty: {
-        msg: 'The email field cannot be empty, please try again.'
+        msg: emptyValidation('Email')
       },
       unique: {
         msg: `This email is already registered. The user's email must be unique.`
@@ -48,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     password: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         isAlphanumeric: {
@@ -60,32 +61,20 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'The password must be at least 8 characters long, please pick a different password.'
         },
         notEmpty: {
-          msg: 'The password field cannot be empty, please try again.'
+          msg: emptyValidation('Password')
         }
       }
     }
   });
 
-  User.associate = models => {
-    // associations can be defined here
-  };
-  // Creates a new user model and adds to database. Returns promise.
-  User.createModel = user => {
-    return User.create(user).catch(err => {
-      logger.info(`ERROR MESSAGE: ${err.message}`);
+  User.createModel = user =>
+    User.create(user).catch(err => {
+      throw errors.savingError(err.errors);
     });
-  };
 
-  // Returns an array of all users.
-  User.getAll = user => {
-    return User.findAll().then(array => array);
-  };
+  User.getAll = () => User.findAll().then(array => array);
 
-  User.getAllWhere = options => {
-    return User.findAll({
-      where: options
-    });
-  };
+  User.getAllWhere = options => User.findAll({ where: options });
 
   return User;
 };
