@@ -72,7 +72,7 @@ module.exports = (sequelize, DataTypes) => {
       throw errors.savingError(err.errors);
     });
 
-  User.getAll = () => User.findAll().then(array => array);
+  User.getAll = () => User.findAll();
 
   User.getAllWhere = options => User.findAll({ where: options });
 
