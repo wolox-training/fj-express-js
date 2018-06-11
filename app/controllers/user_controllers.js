@@ -7,25 +7,31 @@ const logger = require('../logger'),
   User = require('../models').Users;
 
 const validateUser = user => {
+  let errorMsg = '';
   // Name validation (Not null or empty)
   if (!user.firstName || user.firstName.length <= 0) {
     // First name error
-    logger.info('First name cannot be empty.');
+    errorMsg += 'First name cannot be empty.\n';
   }
   if (!user.lastName || user.lastName.length <= 0) {
     // Last name error
-    logger.info('Last name cannot be empty.');
+    errorMsg += 'Last name cannot be empty.\n';
   }
   // Email validation (Belongs to wolox domain AND is valid email format)
   if (user.email.slice(-13) !== '@wolox.com.ar' || !validator.isEmail(user.email)) {
     // Invalid email error
-    logger.info('Email is not a valid email in the @wolox.com.ar domain.');
+    errorMsg += 'Email is not a valid email and/or not in the @wolox.com.ar domain.\n';
+  }
+    if (!user.email || user.email.length <= 0) {
+    // Email must be given
+    errorMsg += 'Email cannot be empty.\n';
   }
   // Password validation
-  if (!validator.isAlphanumeric(user.password) || user.password.lenght < 8) {
+  if (!validator.isAlphanumeric(user.password) || user.password.lenght <= 7) {
     // Invalid password
-    logger.info('Invalid password. Must be 8 characters or longer');
+    errorMsg += 'Invalid password. Must be 8 alphanumeric characters or longer.\n';
   }
+  return errorMsg;
 };
 
 // Returns all users as object array, for testing purposes.
@@ -50,7 +56,11 @@ exports.buildUser = (req, res, next) => {
       }
     : {};
 
-  validateUser(newUser);
+  let valMsg = validateUser(newUser);
+  if (valMsg.length > 0) {
+    valMsg = valMsg.slice(0, -1);
+    res.send(valMsg);
+  }
 
   User.create(newUser).then(
     result => {
