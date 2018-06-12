@@ -36,6 +36,6 @@ module.exports = {
         type: DataTypes.DATE
       }
     }),
-    
+
   down: (queryInterface, Sequelize) => queryInterface.dropTable('Users')
 };
