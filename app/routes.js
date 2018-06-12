@@ -1,6 +1,6 @@
 const logger = require('./logger'),
-  userFunctions = require('./controllers/user_controllers');
+  userFunctions = require('./controllers/user');
 
 exports.init = app => {
-  // Endpoints go here
+  app.post('/users', [], userFunctions.newUser);
 };
