@@ -3,5 +3,4 @@ const logger = require('./logger'),
 
 exports.init = app => {
   app.post('/users', [], userFunctions.newUser);
-  app.get('/', [], userFunctions.returnUsers);
 };

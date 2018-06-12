@@ -7,18 +7,6 @@ const logger = require('../logger'),
   User = require('../models').Users,
   saltRounds = 10;
 
-// Returns all users as object array, for testing purposes.
-exports.returnUsers = (req, res, next) => {
-  User.getAll().then(
-    succ => {
-      res.send(succ);
-    },
-    fail => {
-      next(errors.defaultError(fail));
-    }
-  );
-};
-
 exports.newUser = (req, res, next) => {
   const newUser = req.body
     ? {
@@ -33,14 +21,14 @@ exports.newUser = (req, res, next) => {
   if (valMsgs.length > 0) {
     next(errors.defaultError(valMsgs));
   } else {
-    bcrypt
+    return bcrypt
       .hash(newUser.password, saltRounds)
       .then(hash => {
         newUser.password = hash;
 
         User.createNewUser(newUser)
           .then(user => {
-            res.send(`Successfully logged in. Welcome, ${user.firstName} ${user.lastName}!`);
+            res.status(201).end;
           })
           .catch(err => {
             next(err);
