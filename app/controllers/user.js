@@ -26,13 +26,11 @@ exports.newUser = (req, res, next) => {
       .then(hash => {
         newUser.password = hash;
 
-        User.createNewUser(newUser)
+        return User.createNewUser(newUser)
           .then(user => {
-            res.status(201).end;
+            res.status(201).end();
           })
-          .catch(err => {
-            next(err);
-          });
+          .catch(next);
       })
       .catch(err => {
         next(errors.defaultError(err));
