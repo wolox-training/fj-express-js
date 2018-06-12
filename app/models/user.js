@@ -1,39 +1,39 @@
 'use strict';
 
-const logger = require('../logger'),
-  errors = require('../errors');
+const errors = require('../errors');
 
-// User Model, including validation and corresponding error messages.
+const emptyValidation = field => `The ${field} field cannot be empty. Please try again.`;
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('Users', {
     firstName: {
       type: DataTypes.STRING,
       allowNull: {
         args: false,
-        msg: 'The first name field cannot be empty, please try again.'
+        msg: emptyValidation('First Name')
       },
       notEmpty: {
-        msg: 'The first name field cannot be empty, please try again.'
+        msg: emptyValidation('First Name')
       }
     },
     lastName: {
       type: DataTypes.STRING,
       allowNull: {
         args: false,
-        msg: 'The last name field cannot be empty, please try again.'
+        msg: emptyValidation('Last Name')
       },
       notEmpty: {
-        msg: 'The last name field cannot be empty, please try again.'
+        msg: emptyValidation('Last Name')
       }
     },
     email: {
       type: DataTypes.STRING,
       allowNull: {
         args: false,
-        msg: 'The email field cannot be empty, please try again.'
+        msg: emptyValidation('Email')
       },
       notEmpty: {
-        msg: 'The email field cannot be empty, please try again.'
+        msg: emptyValidation('Email')
       },
       unique: {
         msg: `This email is already registered. The user's email must be unique.`
@@ -54,24 +54,17 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
 
-  // Creates a new user model and adds to database. Returns promise.
-  User.createNewUser = user => {
-    return User.create(user).catch(err => {
-      throw errors.savingError(err.message);
+  User.createModel = user =>
+    User.create(user).catch(err => {
+      throw errors.savingError(err.errors);
     });
-  };
-
-  // Returns an array of all users.
+    
   User.getAll = user =>
     User.findAll().catch(err => {
       throw errors.databaseError(err.message);
     });
 
-  User.getAllWhere = options => {
-    return User.findAll({
-      where: options
-    });
-  };
+  User.getAllWhere = options => User.findAll({ where: options });
 
   return User;
 };
