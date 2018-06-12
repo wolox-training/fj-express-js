@@ -62,7 +62,8 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   // Returns an array of all users.
-  User.getAll = user => User.findAll().catch(err => {
+  User.getAll = user =>
+    User.findAll().catch(err => {
       throw errors.databaseError(err.message);
     });
 
