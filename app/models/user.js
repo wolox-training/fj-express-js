@@ -50,20 +50,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        isAlphanumeric: {
-          msg:
-            'The password can only be comprised of alphanumeric characters, please pick a different password.'
-        },
-        len: {
-          args: [8],
-          msg: 'The password must be at least 8 characters long, please pick a different password.'
-        },
-        notEmpty: {
-          msg: emptyValidation('Password')
-        }
-      }
+      allowNull: false
     }
   });
 
@@ -72,7 +59,10 @@ module.exports = (sequelize, DataTypes) => {
       throw errors.savingError(err.errors);
     });
 
-  User.getAll = () => User.findAll();
+  User.getAll = user =>
+    User.findAll().catch(err => {
+      throw errors.databaseError(err.message);
+    });
 
   User.getAllWhere = options => User.findAll({ where: options });
 
