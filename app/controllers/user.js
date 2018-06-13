@@ -17,9 +17,9 @@ exports.newUser = (req, res, next) => {
       }
     : {};
 
-  const valMsgs = validation.validateUser(newUser);
-  if (valMsgs.length > 0) {
-    next(errors.invalidUser(valMsgs));
+  const errMsg = validation.validateUser(newUser);
+  if (errMsg.length > 0) {
+    next(errors.invalidUser(errMsg));
   } else {
     return bcrypt
       .hash(newUser.password, saltRounds)
@@ -39,6 +39,38 @@ exports.newUser = (req, res, next) => {
       })
       .catch(err => {
         next(errors.savingError(err.message));
+      });
+  }
+};
+
+exports.signIn = (req, res, next) => {
+  const credentials = req.body
+    ? {
+        password: req.body.password,
+        email: req.body.email
+      }
+    : {};
+
+  const errMsg = validation.validateSignIn(credentials);
+  if (errMsg.length > 0) {
+    next(errors.invalidUser(errMsg));
+  } else {
+    return User.getOneWhere(['email', 'password'], { email: credentials.email })
+      .then(user => {
+        if (user) {
+          bcrypt.compare(credentials.password, user.password)
+          .then(bool => {
+            if(bool) {
+              res.status(200);
+              // TODO: CREATE TOKEN
+              res.send(user);
+            } else {
+              next(errors.invalidUser);
+            }
+          })
+        } else {
+          next(errors.invalidUser)
+        }
       });
   }
 };

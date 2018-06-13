@@ -66,5 +66,21 @@ module.exports = (sequelize, DataTypes) => {
 
   User.getAllWhere = options => User.findAll({ where: options });
 
+  User.getAttributesWhere = (att, arg) =>
+    User.findAll({
+      attributes: att,
+      where: arg
+    }).catch(err => {
+      throw errors.databaseError(err.message);
+    });
+
+  User.getOneWhere = (att, arg) =>
+    User.findOne({
+      attributes: att,
+      where: arg
+    }).catch(err => {
+      throw errors.databaseError(err.message);
+    });
+
   return User;
 };

@@ -29,3 +29,19 @@ exports.validateUser = user => {
   }
   return errorMsgs;
 };
+
+exports.validateSignIn = user => {
+  const errorMsgs = [];
+  if (user.email == null) {
+    errorMsgs.push('Email cannot be null.');
+  } else if (user.email.length <= 0) {
+    errorMsgs.push('Email cannot be empty.');
+  } else if (user.email.slice(-13) !== '@wolox.com.ar' || !validator.isEmail(user.email)) {
+    errorMsgs.push('Email is not a valid email and/or not in the @wolox.com.ar domain.');
+  }
+
+  if (user.password == null) {
+    errorMsgs.push('Password cannot be null.');
+  }
+  return errorMsgs;
+};
