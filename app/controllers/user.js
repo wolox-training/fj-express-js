@@ -28,6 +28,9 @@ exports.newUser = (req, res, next) => {
 
         return User.createModel(newUser)
           .then(user => {
+            res.statusMessage = `Successfully created new user. Welcome, ${newUser.firstName} ${
+              newUser.lastName
+            }!`;
             res.status(200).end();
           })
           .catch(err => {
