@@ -19,7 +19,7 @@ exports.newUser = (req, res, next) => {
 
   const valMsgs = validation.validateUser(newUser);
   if (valMsgs.length > 0) {
-    next(errors.defaultError(valMsgs));
+    next(errors.invalidUser(valMsgs));
   } else {
     return bcrypt
       .hash(newUser.password, saltRounds)
@@ -33,7 +33,7 @@ exports.newUser = (req, res, next) => {
           .catch(next);
       })
       .catch(err => {
-        next(errors.defaultError(err));
+        next(errors.savingError(err));
       });
   }
 };

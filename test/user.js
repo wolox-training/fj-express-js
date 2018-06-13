@@ -1,6 +1,7 @@
 const chai = require('chai'),
   dictum = require('dictum.js'),
   server = require('./../app'),
+  logger = require('../app/logger'),
   should = chai.should();
 
 const chaiPost = (path, object) =>
@@ -20,6 +21,9 @@ describe('/users POST', () => {
         email: 'email@wolox.com.ar'
       })
       .catch(err => {
+        logger.info('**********************');
+        logger.info(err);
+        logger.info('**********************');
         err.should.have.status(400);
         err.response.should.be.json;
         err.response.body.should.have.property('message');
