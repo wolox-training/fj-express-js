@@ -26,14 +26,16 @@ exports.newUser = (req, res, next) => {
       .then(hash => {
         newUser.password = hash;
 
-        return User.createNewUser(newUser)
+        return User.createModel(newUser)
           .then(user => {
-            res.status(201).end();
+            res.status(200).end();
           })
-          .catch(next);
+          .catch(err => {
+            next(errors.savingError(err.message));
+          });
       })
       .catch(err => {
-        next(errors.savingError(err));
+        next(errors.savingError(err.message));
       });
   }
 };

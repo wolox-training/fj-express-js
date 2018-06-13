@@ -21,9 +21,6 @@ describe('/users POST', () => {
         email: 'email@wolox.com.ar'
       })
       .catch(err => {
-        logger.info('**********************');
-        logger.info(err);
-        logger.info('**********************');
         err.should.have.status(400);
         err.response.should.be.json;
         err.response.body.should.have.property('message');
@@ -119,6 +116,23 @@ describe('/users POST', () => {
         err.response.should.be.json;
         err.response.body.should.have.property('message');
         err.response.body.should.have.property('internal_code');
+      })
+      .then(() => done());
+  });
+
+  it('should be successful', done => {
+    chai
+      .request(server)
+      .post('/users')
+      .send({
+        firstName: 'firstName',
+        lastName: 'lastName',
+        password: 'password',
+        email: 'email2@wolox.com.ar'
+      })
+      .then(res => {
+        res.should.have.status(200);
+        dictum.chai(res);
       })
       .then(() => done());
   });
