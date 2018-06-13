@@ -28,8 +28,6 @@ describe('/users POST', () => {
       .then(() => done());
   });
 
-  /*
-
   it('should fail because last name is missing', done => {
     chai
       .request(server)
@@ -119,5 +117,5 @@ describe('/users POST', () => {
         err.response.body.should.have.property('internal_code');
       })
       .then(() => done());
-  }); */
+  });
 });
