@@ -2,6 +2,7 @@
 
 const logger = require('../logger'),
   validation = require('./validation'),
+  tokens = require('./../services/tokenSessions'),
   bcrypt = require('bcryptjs'),
   errors = require('../errors'),
   User = require('../models').Users,
@@ -58,12 +59,13 @@ exports.signIn = (req, res, next) => {
     return User.getOneWhere(['email', 'password'], { email: credentials.email })
       .then(user => {
         if (user) {
-          bcrypt.compare(credentials.password, user.password)
+          return bcrypt.compare(credentials.password, user.password)
           .then(bool => {
             if(bool) {
+              const auth = tokens.encode({username: user.username});
+              
               res.status(200);
-              // TODO: CREATE TOKEN
-              res.send(user);
+              res.send('SUCCESS!!!');
             } else {
               next(errors.invalidUser);
             }
@@ -71,6 +73,9 @@ exports.signIn = (req, res, next) => {
         } else {
           next(errors.invalidUser)
         }
+      })
+      .catch(err => {
+        next(errors.defaultError(err.message));
       });
   }
 };
