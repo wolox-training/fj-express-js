@@ -25,10 +25,9 @@ exports.newUser = (req, res, next) => {
       .hash(newUser.password, saltRounds)
       .then(hash => {
         newUser.password = hash;
-        return User.createModel(newUser)
-          .then(user => {
-            res.status(201).end();
-          })
+        return User.createModel(newUser).then(user => {
+          res.status(201).end();
+        });
       })
       .catch(err => {
         next(errors.savingError(err.message));

@@ -26,7 +26,7 @@ describe('/users POST', () => {
         err.response.body.should.have.property('message');
         err.response.body.should.have.property('internal_code');
         done();
-      })
+      });
   });
 
   it('should fail because last name is missing', done => {
@@ -44,7 +44,7 @@ describe('/users POST', () => {
         err.response.body.should.have.property('message');
         err.response.body.should.have.property('internal_code');
         done();
-      })
+      });
   });
 
   it('should fail because email is missing', done => {
@@ -62,7 +62,7 @@ describe('/users POST', () => {
         err.response.body.should.have.property('message');
         err.response.body.should.have.property('internal_code');
         done();
-      })
+      });
   });
 
   it('should fail because password is missing', done => {
@@ -80,7 +80,7 @@ describe('/users POST', () => {
         err.response.body.should.have.property('message');
         err.response.body.should.have.property('internal_code');
         done();
-      })
+      });
   });
 
   it('should fail because password is too short/not alphanumeric', done => {
@@ -99,7 +99,7 @@ describe('/users POST', () => {
         err.response.body.should.have.property('message');
         err.response.body.should.have.property('internal_code');
         done();
-      })
+      });
   });
 
   it('should fail because email is already in use', done => {
@@ -117,7 +117,7 @@ describe('/users POST', () => {
         err.response.body.should.have.property('message');
         err.response.body.should.have.property('internal_code');
         done();
-      })
+      });
   });
 
   it('should be successful', done => {
@@ -132,8 +132,9 @@ describe('/users POST', () => {
       })
       .then(res => {
         res.should.have.status(200);
+        res.body.should.have.property('message');
         dictum.chai(res);
         done();
-      })
+      });
   });
 });
