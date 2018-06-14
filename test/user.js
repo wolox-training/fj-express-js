@@ -131,7 +131,7 @@ describe('/users POST', () => {
         email: 'email2@wolox.com.ar'
       })
       .then(res => {
-        res.should.have.status(200);
+        res.should.have.status(201);
         res.body.should.have.property('message');
         dictum.chai(res);
         done();
