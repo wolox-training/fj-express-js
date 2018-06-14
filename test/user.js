@@ -132,7 +132,6 @@ describe('/users POST', () => {
       })
       .then(res => {
         res.should.have.status(201);
-        res.body.should.have.property('message');
         dictum.chai(res);
         done();
       });
