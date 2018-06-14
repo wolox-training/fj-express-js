@@ -32,11 +32,8 @@ exports.newUser = (req, res, next) => {
             res.statusMessage = `Successfully created new user. Welcome, ${newUser.firstName} ${
               newUser.lastName
             }!`;
-            res.status(200).end();
+            res.status(201).end();
           })
-          .catch(err => {
-            next(errors.savingError(err.message));
-          });
       })
       .catch(err => {
         next(errors.savingError(err.message));
