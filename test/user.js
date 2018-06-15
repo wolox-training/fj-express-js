@@ -2,6 +2,7 @@ const chai = require('chai'),
   dictum = require('dictum.js'),
   server = require('./../app'),
   logger = require('../app/logger'),
+  User = require('../app/models').Users,
   should = chai.should(),
   expect = require('chai').expect;
 
@@ -138,19 +139,32 @@ describe('/users POST', () => {
   });
 
   it('should be successful', done => {
+    const userObj = {
+      firstName: 'firstName',
+      lastName: 'lastName',
+      password: 'password',
+      email: 'email2@wolox.com.ar'
+    };
     chai
       .request(server)
       .post('/users')
-      .send({
-        firstName: 'firstName',
-        lastName: 'lastName',
-        password: 'password',
-        email: 'email2@wolox.com.ar'
-      })
+      .send(userObj)
       .then(res => {
         res.status.should.be.equal(201);
-        dictum.chai(res);
-        done();
+        User.findOne({
+          attributes: ['firstName', 'lastName', 'email'],
+          where: {
+            firstName: 'firstName',
+            lastName: 'lastName',
+            email: 'email2@wolox.com.ar'
+          }
+        }).then(db => {
+          expect(db.firstName).to.eql(userObj.firstName);
+          expect(db.lastName).to.eql(userObj.lastName);
+          expect(db.email).to.eql(userObj.email);
+          dictum.chai(res);
+          done();
+        });
       });
   });
 });
