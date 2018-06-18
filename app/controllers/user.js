@@ -56,9 +56,10 @@ exports.signIn = (req, res, next) => {
         if (user) {
           return bcrypt.compare(credentials.password, user.password).then(bool => {
             if (bool) {
-              const auth = tokens.encode({ username: user.username });
+              const auth = tokens.encode({ email: user.email });
               res.status(200);
-              res.send('SUCCESS!!!');
+              res.set(tokens.headerName, auth);
+              res.send('Token received successfully!');
             } else {
               next(errors.invalidUser);
             }
