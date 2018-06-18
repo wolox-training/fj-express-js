@@ -3,7 +3,7 @@ const logger = require('./logger'),
   userFunctions = require('./controllers/user');
 
 exports.init = app => {
-  app.post('/users', [], userFunctions.newUser);
+  app.post('/users', userFunctions.newUser);
   app.get('/users', [tokenValidation.validateToken], userFunctions.listUsers);
-  app.post('/users/sessions', [], userFunctions.signIn);
+  app.post('/users/sessions', userFunctions.signIn);
 };

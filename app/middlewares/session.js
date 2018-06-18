@@ -1,17 +1,26 @@
 const tokens = require('../services/tokenSessions'),
+  User = require('../models').Users,
   logger = require('../logger'),
-  errors = require('./errors');
+  errors = require('../errors');
 
 exports.validateToken = (req, res, next) => {
-  if (req.Headers[tokens.headerName] === undefined || !req.Headers[tokens.headerName]) {
-    next(errors.invalidToken('Error: Invalid header.'));
+  const token = req.headers[tokens.headerName];
+  if (token) {
+    const payload = tokens.decode(token);
+    User.findOne({ where: payload }).then(dbUser => {
+      if (dbUser) {
+        // ACCESS GRANTED
+        req.user = dbUser;
+        next();
+      } else {
+        res.status(401);
+        res.end();
+        next(errors.invalidToken('Invalid token.'));
+      }
+    });
   } else {
-    const token = req.Headers[tokens.headerName];
-    if (token === undefined || !token) {
-      next(errors.invalidToken('Error: No token found.'));
-    } else {
-      const payload = tokens.decode(token);
-      res.send(payload);
-    }
+    res.status(401);
+    res.end();
+    next(errors.invalidToken('Missing token.'));
   }
 };

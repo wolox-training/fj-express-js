@@ -76,4 +76,5 @@ exports.signIn = (req, res, next) => {
 
 exports.listUsers = (req, res, next) => {
   // TODO
+  res.send(req.user);
 };
