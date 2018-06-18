@@ -61,15 +61,15 @@ exports.signIn = (req, res, next) => {
               res.set(tokens.headerName, auth);
               res.send('Token received successfully!');
             } else {
-              next(errors.invalidUser);
+              next(errors.invalidUser('The email/password combination you entered is invalid.'));
             }
           });
         } else {
-          next(errors.invalidUser);
+          next(errors.invalidUser('There is no user registered with that email.'));
         }
       })
       .catch(err => {
-        next(errors.defaultError(err.message));
+        next(errors.databaseError(err.message));
       });
   }
 };
