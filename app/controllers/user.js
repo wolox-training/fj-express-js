@@ -19,21 +19,18 @@ exports.newUser = (req, res, next) => {
 
   const valMsgs = validation.validateUser(newUser);
   if (valMsgs.length > 0) {
-    next(errors.defaultError(valMsgs));
+    next(errors.invalidUser(valMsgs));
   } else {
     return bcrypt
       .hash(newUser.password, saltRounds)
       .then(hash => {
         newUser.password = hash;
-
-        return User.createNewUser(newUser)
-          .then(user => {
-            res.status(201).end();
-          })
-          .catch(next);
+        return User.createModel(newUser).then(user => {
+          res.status(201).end();
+        });
       })
       .catch(err => {
-        next(errors.defaultError(err));
+        next(errors.savingError(err.message));
       });
   }
 };

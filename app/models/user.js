@@ -56,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
 
   User.createModel = user =>
     User.create(user).catch(err => {
-      throw errors.savingError(err.errors);
+      throw errors.databaseError(err.message);
     });
 
   User.getAll = user =>
