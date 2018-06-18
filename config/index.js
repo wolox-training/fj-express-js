@@ -13,7 +13,7 @@ const isObject = variable => {
 };
 
 /*
- * Deep copy of source object into tarjet object.
+ * Deep copy of source object into target object.
  * It does not overwrite properties.
 */
 const assignObject = (target, source) => {

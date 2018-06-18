@@ -3,6 +3,7 @@ const chai = require('chai'),
   server = require('./../app'),
   logger = require('../app/logger'),
   User = require('../app/models').Users,
+  token = require('../app/services/tokenSessions'),
   should = chai.should(),
   expect = require('chai').expect;
 
@@ -165,6 +166,91 @@ describe('/users POST', () => {
           dictum.chai(res);
           done();
         });
+      });
+  });
+});
+
+describe('/users/sessions POST', () => {
+  it(`should fail because email is not in Wolox's domain & null password`, done => {
+    chaiPost('/users/sessions', {
+      email: 'user@.com.ar'
+    }).catch(err => {
+      err.should.have.status(400);
+      err.response.should.be.json;
+      err.response.body.should.have.property('message');
+      err.response.body.should.have.property('internal_code');
+      expect(err.response.body.message).to.eql([
+        'Email is not a valid email and/or not in the @wolox.com.ar domain.',
+        'Password cannot be null.'
+      ]);
+      expect(err.response.body.internal_code).to.equal('invalid_user');
+      done();
+    });
+  });
+
+  it('should fail because email is not registered', done => {
+    chaiPost('/users/sessions', {
+      email: 'user@wolox.com.ar',
+      password: 'validpass'
+    }).catch(err => {
+      err.should.have.status(400);
+      err.response.should.be.json;
+      err.response.body.should.have.property('message');
+      err.response.body.should.have.property('internal_code');
+      expect(err.response.body.message).to.equal('There is no user registered with that email.');
+      expect(err.response.body.internal_code).to.equal('invalid_user');
+      done();
+    });
+  });
+
+  it('should fail because password is incorrect', done => {
+    const userObject = {
+      firstName: 'firstName',
+      lastName: 'lastName',
+      password: 'validpass',
+      email: 'email@wolox.com.ar'
+    };
+    chaiPost('/users', userObject)
+      .then(() =>
+        chaiPost('/users/sessions', {
+          email: 'email@wolox.com.ar',
+          password: 'invalidpass'
+        })
+      )
+      .catch(err => {
+        err.should.have.status(400);
+        err.response.should.be.json;
+        err.response.body.should.have.property('message');
+        err.response.body.should.have.property('internal_code');
+        expect(err.response.body.message).to.equal('The email/password combination you entered is invalid.');
+        expect(err.response.body.internal_code).to.equal('invalid_user');
+        done();
+      });
+  });
+
+  it('should be successful', done => {
+    const userObject = {
+      firstName: 'firstName',
+      lastName: 'lastName',
+      password: 'validpass',
+      email: 'email@wolox.com.ar'
+    };
+    chaiPost('/users', userObject)
+      .then(() =>
+        chaiPost('/users/sessions', {
+          email: 'email@wolox.com.ar',
+          password: 'validpass'
+        })
+      )
+      .then(res => {
+        expect(res.header).to.have.property('authorization');
+        const auth = token.encode(userObject.email);
+        expect(token.decode(res.header.authorization)).to.eql({
+          email: 'email@wolox.com.ar'
+        });
+        expect(res.status).to.equal(200);
+        dictum.chai(res);
+        done();
       });
   });
 });
