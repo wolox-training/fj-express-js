@@ -73,3 +73,7 @@ exports.signIn = (req, res, next) => {
       });
   }
 };
+
+exports.listUsers = (req, res, next) => {
+  // TODO
+};
