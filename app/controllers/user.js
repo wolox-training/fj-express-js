@@ -67,7 +67,6 @@ exports.signIn = (req, res, next) => {
         } else {
           next(errors.invalidUser('There is no user registered with that email.'));
         }
-
       })
       .catch(err => {
         next(errors.databaseError(err.message));
