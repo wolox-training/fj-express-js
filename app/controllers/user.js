@@ -26,14 +26,12 @@ exports.newUser = (req, res, next) => {
       .hash(newUser.password, saltRounds)
       .then(hash => {
         newUser.password = hash;
-
-        return User.createModel(newUser)
-          .then(user => {
-            res.statusMessage = `Successfully created new user. Welcome, ${newUser.firstName} ${
-              newUser.lastName
-            }!`;
-            res.status(201).end();
-          })
+        return User.createModel(newUser).then(user => {
+          res.statusMessage = `Successfully created new user. Welcome, ${newUser.firstName} ${
+            newUser.lastName
+          }!`;
+          res.status(201).end();
+        });
       })
       .catch(err => {
         next(errors.savingError(err.message));
@@ -56,19 +54,17 @@ exports.signIn = (req, res, next) => {
     return User.getOneWhere(['email', 'password'], { email: credentials.email })
       .then(user => {
         if (user) {
-          return bcrypt.compare(credentials.password, user.password)
-          .then(bool => {
-            if(bool) {
-              const auth = tokens.encode({username: user.username});
-              
+          return bcrypt.compare(credentials.password, user.password).then(bool => {
+            if (bool) {
+              const auth = tokens.encode({ username: user.username });
               res.status(200);
               res.send('SUCCESS!!!');
             } else {
               next(errors.invalidUser);
             }
-          })
+          });
         } else {
-          next(errors.invalidUser)
+          next(errors.invalidUser);
         }
       })
       .catch(err => {
