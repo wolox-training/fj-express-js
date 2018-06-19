@@ -76,5 +76,13 @@ exports.signIn = (req, res, next) => {
 
 exports.listUsers = (req, res, next) => {
   // TODO
-  res.send(req.user);
+  const lim = req.limit || 5;
+  const page = req.page || 0;
+  User.findAndCountAll({
+    attributes: ['firstName', 'lastName', 'email'],
+    offset: 10 * page,
+    limit: lim
+  }).then(userList => {
+    res.send(userList.rows);
+  });
 };

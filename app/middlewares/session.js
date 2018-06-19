@@ -9,7 +9,6 @@ exports.validateToken = (req, res, next) => {
     const payload = tokens.decode(token);
     User.findOne({ where: payload }).then(dbUser => {
       if (dbUser) {
-        // ACCESS GRANTED
         req.user = dbUser;
         next();
       } else {

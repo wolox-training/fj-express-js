@@ -66,18 +66,20 @@ module.exports = (sequelize, DataTypes) => {
 
   User.getAllWhere = options => User.findAll({ where: options });
 
-  User.getAttributesWhere = (att, arg) =>
-    User.findAll({
-      attributes: att,
-      where: arg
+  User.getOneWhere = (attributes, where) =>
+    User.findOne({
+      attributes,
+      where
     }).catch(err => {
       throw errors.databaseError(err.message);
     });
 
-  User.getOneWhere = (att, arg) =>
-    User.findOne({
-      attributes: att,
-      where: arg
+  User.getAllPaginate = (attributes, where, offset, limit) =>
+    User.getAndCountAll({
+      attributes,
+      where,
+      offset,
+      limit
     }).catch(err => {
       throw errors.databaseError(err.message);
     });
