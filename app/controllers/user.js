@@ -27,9 +27,7 @@ exports.newUser = (req, res, next) => {
       .then(hash => {
         newUser.password = hash;
         return User.createModel(newUser).then(user => {
-          res.statusMessage = `Successfully created new user. Welcome, ${newUser.firstName} ${
-            newUser.lastName
-          }!`;
+          logger.info(`Successfully created new user. Welcome, ${newUser.firstName} ${newUser.lastName}!`);
           res.status(201).end();
         });
       })
@@ -52,14 +50,14 @@ exports.signIn = (req, res, next) => {
     next(errors.invalidUser(errMsg));
   } else {
     return User.getOneWhere(['email', 'password'], { email: credentials.email })
-      .then(user => {
-        if (user) {
-          return bcrypt.compare(credentials.password, user.password).then(bool => {
-            if (bool) {
-              const auth = tokens.encode({ email: user.email });
+      .then(dbUser => {
+        if (dbUser) {
+          return bcrypt.compare(credentials.password, dbUser.password).then(validPass => {
+            if (validPass) {
+              const auth = tokens.encode({ email: dbUser.email });
               res.status(200);
               res.set(tokens.headerName, auth);
-              res.send('Token received successfully!');
+              res.end();
             } else {
               next(errors.invalidUser('The email/password combination you entered is invalid.'));
             }

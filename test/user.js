@@ -256,6 +256,7 @@ describe('/users/sessions POST', () => {
         expect(token.decode(res.header.authorization)).to.eql({
           email: 'email@wolox.com.ar'
         });
+        expect(res.status).to.equal(200);
         dictum.chai(res);
         done();
       });
