@@ -14,12 +14,12 @@ exports.validateToken = (req, res, next) => {
       } else {
         res.status(401);
         res.end();
-        next(errors.invalidToken('Invalid token.'));
+        // next(errors.invalidToken('Invalid token.'));
       }
     });
   } else {
     res.status(401);
     res.end();
-    next(errors.invalidToken('Missing token.'));
+    // next(errors.invalidToken('Missing token.'));
   }
 };

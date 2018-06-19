@@ -3,9 +3,17 @@ const chai = require('chai'),
   server = require('./../app'),
   logger = require('../app/logger'),
   User = require('../app/models').Users,
+  factory = require('factory-girl').factory,
   token = require('../app/services/tokenSessions'),
   should = chai.should(),
   expect = require('chai').expect;
+
+factory.define('user', User, {
+  firstName: factory.seq('User.firstName', n => `firstName${n}`),
+  lastName: factory.seq('User.lastName', n => `lastName${n}`),
+  email: factory.seq('User.email', n => `firstLast${n}@wolox.com.ar`),
+  password: 'password'
+});
 
 const chaiPost = (path, object) =>
   chai
@@ -251,5 +259,55 @@ describe('/users/sessions POST', () => {
         dictum.chai(res);
         done();
       });
+  });
+});
+
+describe('/users GET', () => {
+  it('should fail because session has no token', done => {
+    chai
+      .request(server)
+      .get('/users')
+      .query({
+        page: 1,
+        limit: 10
+      })
+      .catch(err => {
+        err.should.have.status(401);
+        done();
+      });
+  });
+
+  it('should fail because session is not valid', done => {
+    chai
+      .request(server)
+      .get('/users')
+      .set(token.headerName, token.encode({ email: 'all your base belong to us' }))
+      .query({
+        page: 1,
+        limit: 10
+      })
+      .catch(err => {
+        err.should.have.status(401);
+        done();
+      });
+  });
+
+  it('should be successful', done => {
+    factory.createMany('user', 20).then(newUsers => {
+      chai
+        .request(server)
+        .get('/users')
+        .set(token.headerName, token.encode({ email: newUsers[0].email }))
+        .query({
+          page: 1,
+          limit: 10
+        })
+        .then(res => {
+          res.status.should.be.equal(200);
+          expect(res.body.length).to.eql(10);
+          dictum.chai(res);
+          done();
+        });
+    });
   });
 });

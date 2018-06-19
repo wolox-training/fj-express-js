@@ -74,15 +74,5 @@ module.exports = (sequelize, DataTypes) => {
       throw errors.databaseError(err.message);
     });
 
-  User.getAllPaginate = (attributes, where, offset, limit) =>
-    User.getAndCountAll({
-      attributes,
-      where,
-      offset,
-      limit
-    }).catch(err => {
-      throw errors.databaseError(err.message);
-    });
-
   return User;
 };
