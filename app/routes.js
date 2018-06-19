@@ -5,6 +5,6 @@ const logger = require('./logger'),
 exports.init = app => {
   app.post('/users', userFunctions.newUser);
   app.get('/users', [tokenValidation.validateToken], userFunctions.listUsers);
-  app.post('/admin/users', [tokenValidation.validateToken], userFunctions.listUsers);
+  app.post('/admin/users', [tokenValidation.validateToken], userFunctions.newAdmin);
   app.post('/users/sessions', userFunctions.signIn);
 };

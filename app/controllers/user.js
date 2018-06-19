@@ -41,6 +41,7 @@ exports.newAdmin = (req, res, next) => {
   if (!req.user.isAdmin) {
     next(errors.invalidUser('User does not have access to this resource.'));
   }
+
   const admin = req.body
     ? {
         firstName: req.body.firstName,
@@ -58,10 +59,25 @@ exports.newAdmin = (req, res, next) => {
       .hash(admin.password, saltRounds)
       .then(hash => {
         admin.password = hash;
-        return User.findOrCreate(admin).then(user => {
-          logger.info(`Successfully created new admin. Welcome, ${admin.firstName} ${admin.lastName}!`);
-          res.status(201).end();
-        });
+        return User.findOne({ where: { email: admin.email } })
+          .then(result => {
+            if (result) {
+              result.isAdmin = true;
+              result.save().then(oldAdmin => {
+                logger.info(`Successfully granted admin status to user.`);
+                res.status(201).end();
+              });
+            } else {
+              admin.isAdmin = true;
+              User.createModel(admin).then(newAdmin => {
+                logger.info(`Successfully created new admin.`);
+                res.status(201).end();
+              });
+            }
+          })
+          .catch(err => {
+            next(errors.databaseError(err.message));
+          });
       })
       .catch(err => {
         next(errors.savingError(err.message));
