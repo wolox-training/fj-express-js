@@ -274,6 +274,10 @@ describe('/users GET', () => {
       })
       .catch(err => {
         err.should.have.status(401);
+        err.response.body.should.have.property('message');
+        err.response.body.should.have.property('internal_code');
+        expect(err.response.body.message).to.equal('Missing token.');
+        expect(err.response.body.internal_code).to.equal('invalid_token');
         done();
       });
   });
@@ -289,6 +293,10 @@ describe('/users GET', () => {
       })
       .catch(err => {
         err.should.have.status(401);
+        err.response.body.should.have.property('message');
+        err.response.body.should.have.property('internal_code');
+        expect(err.response.body.message).to.equal('Invalid token.');
+        expect(err.response.body.internal_code).to.equal('invalid_token');
         done();
       });
   });

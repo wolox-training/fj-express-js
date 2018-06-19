@@ -12,14 +12,12 @@ exports.validateToken = (req, res, next) => {
         req.user = dbUser;
         next();
       } else {
-        res.status(401);
-        res.end();
-        // next(errors.invalidToken('Invalid token.'));
+        // res.status(401);
+        // res.end();
+        next(errors.invalidToken('Invalid token.'));
       }
     });
   } else {
-    res.status(401);
-    res.end();
-    // next(errors.invalidToken('Missing token.'));
+    next(errors.invalidToken('Missing token.'));
   }
 };
