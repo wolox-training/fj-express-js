@@ -5,14 +5,25 @@ const chai = require('chai'),
   User = require('../app/models').Users,
   factory = require('factory-girl').factory,
   token = require('../app/services/tokenSessions'),
+  bcrypt = require('bcryptjs'),
   should = chai.should(),
   expect = require('chai').expect;
+
+const hashed = bcrypt.hashSync('password', 10);
 
 factory.define('user', User, {
   firstName: factory.seq('User.firstName', n => `firstName${n}`),
   lastName: factory.seq('User.lastName', n => `lastName${n}`),
   email: factory.seq('User.email', n => `firstLast${n}@wolox.com.ar`),
-  password: token.encode({ email: 'password' })
+  password: hashed
+});
+
+factory.define('admin', User, {
+  firstName: factory.seq('User.firstName', n => `admin${n}`),
+  lastName: factory.seq('User.lastName', n => `guy${n}`),
+  email: factory.seq('User.email', n => `adminguy${n}@wolox.com.ar`),
+  password: hashed,
+  isAdmin: true
 });
 
 const chaiPost = (path, object) =>
@@ -316,6 +327,110 @@ describe('/users GET', () => {
           expect(res.body.length).to.eql(10);
           dictum.chai(res);
           done();
+        });
+    });
+  });
+});
+
+describe('/admin/users POST', () => {
+  it('should fail because user is not an admin', done => {
+    factory.create('user').then(user => {
+      chai
+        .request(server)
+        .post('/admin/users')
+        .set(token.headerName, token.encode({ email: user.email }))
+        .send({
+          firstName: user.firstName,
+          lastName: user.lastName,
+          password: 'password',
+          email: user.email
+        })
+        .catch(err => {
+          err.should.have.status(400);
+          err.response.body.should.have.property('message');
+          err.response.body.should.have.property('internal_code');
+          expect(err.response.body.message).to.equal('User does not have access to this resource.');
+          expect(err.response.body.internal_code).to.equal('invalid_user');
+          done();
+        });
+    });
+  });
+
+  it('should fail because arguments are invalid', done => {
+    factory.create('admin').then(admin => {
+      chai
+        .request(server)
+        .post('/admin/users')
+        .set(token.headerName, token.encode({ email: admin.email }))
+        .send({
+          firstName: '',
+          lastName: '',
+          password: 'pas-',
+          email: 'myguy@molox.com.mx'
+        })
+        .catch(err => {
+          err.should.have.status(400);
+          err.response.body.should.have.property('message');
+          err.response.body.should.have.property('internal_code');
+          expect(err.response.body.message).to.eql([
+            'First name cannot be empty.',
+            'Last name cannot be empty.',
+            'Email is not a valid email and/or not in the @wolox.com.ar domain.',
+            'Invalid password. Must be 8 alphanumeric characters or longer.'
+          ]);
+          expect(err.response.body.internal_code).to.equal('invalid_user');
+          done();
+        });
+    });
+  });
+
+  it('should be successful (granting permission)', done => {
+    factory.create('user').then(user => {
+      factory.create('admin').then(admin => {
+        chai
+          .request(server)
+          .post('/admin/users')
+          .set(token.headerName, token.encode({ email: admin.email }))
+          .send({
+            firstName: user.firstName,
+            lastName: user.lastName,
+            password: 'password',
+            email: user.email
+          })
+          .then(res => {
+            expect(res.status).to.equal(201);
+            User.findOne({ where: { email: user.email } }).then(dbUser => {
+              expect(dbUser.isAdmin).to.eql(true);
+              dictum.chai(res);
+              done();
+            });
+          });
+      });
+    });
+  });
+
+  it('should be successful (creating new admin)', done => {
+    factory.create('admin').then(admin => {
+      chai
+        .request(server)
+        .post('/admin/users')
+        .set(token.headerName, token.encode({ email: admin.email }))
+        .send({
+          firstName: 'admin2',
+          lastName: 'guy2',
+          password: 'password',
+          email: 'adminguy2@wolox.com.ar'
+        })
+        .then(res => {
+          expect(res.status).to.equal(201);
+          User.findOne({ where: { email: 'adminguy2@wolox.com.ar' } }).then(dbUser => {
+            expect(dbUser.firstName).to.eql('admin2');
+            expect(dbUser.lastName).to.eql('guy2');
+            expect(dbUser.email).to.eql('adminguy2@wolox.com.ar');
+            expect(dbUser.isAdmin).to.eql(true);
+            dictum.chai(res);
+            done();
+          });
         });
     });
   });
