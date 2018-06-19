@@ -27,6 +27,10 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false
       },
+      isAdmin: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

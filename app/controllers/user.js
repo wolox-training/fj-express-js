@@ -37,6 +37,38 @@ exports.newUser = (req, res, next) => {
   }
 };
 
+exports.newAdmin = (req, res, next) => {
+  if (!req.user.isAdmin) {
+    next(errors.invalidUser('User does not have access to this resource.'));
+  }
+  const admin = req.body
+    ? {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        password: req.body.password,
+        email: req.body.email
+      }
+    : {};
+
+  const errMsg = validation.validateUser(admin);
+  if (errMsg.length > 0) {
+    next(errors.invalidUser(errMsg));
+  } else {
+    return bcrypt
+      .hash(admin.password, saltRounds)
+      .then(hash => {
+        admin.password = hash;
+        return User.findOrCreate(admin).then(user => {
+          logger.info(`Successfully created new admin. Welcome, ${admin.firstName} ${admin.lastName}!`);
+          res.status(201).end();
+        });
+      })
+      .catch(err => {
+        next(errors.savingError(err.message));
+      });
+  }
+};
+
 exports.signIn = (req, res, next) => {
   const credentials = req.body
     ? {
