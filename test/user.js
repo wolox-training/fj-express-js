@@ -307,6 +307,7 @@ describe('/users GET', () => {
         .then(res => {
           res.status.should.be.equal(200);
           expect(res.body.rows.length).to.eql(10);
+          expect(res.body.count).to.eql(20);
           dictum.chai(res);
           done();
         });
