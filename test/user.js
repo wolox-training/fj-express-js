@@ -3,28 +3,11 @@ const chai = require('chai'),
   server = require('./../app'),
   logger = require('../app/logger'),
   User = require('../app/models').Users,
-  factory = require('factory-girl').factory,
+  factory = require('./testFactory').factory,
   token = require('../app/services/tokenSessions'),
   bcrypt = require('bcryptjs'),
   should = chai.should(),
   expect = require('chai').expect;
-
-const hashed = bcrypt.hashSync('password', 10);
-
-factory.define('user', User, {
-  firstName: factory.seq('User.firstName', n => `firstName${n}`),
-  lastName: factory.seq('User.lastName', n => `lastName${n}`),
-  email: factory.seq('User.email', n => `firstLast${n}@wolox.com.ar`),
-  password: hashed
-});
-
-factory.define('admin', User, {
-  firstName: factory.seq('User.firstName', n => `admin${n}`),
-  lastName: factory.seq('User.lastName', n => `guy${n}`),
-  email: factory.seq('User.email', n => `adminguy${n}@wolox.com.ar`),
-  password: hashed,
-  isAdmin: true
-});
 
 const chaiPost = (path, object) =>
   chai
@@ -319,14 +302,33 @@ describe('/users GET', () => {
         .get('/users')
         .set(token.headerName, token.encode({ email: newUsers[0].email }))
         .query({
-          page: 1,
-          limit: 10
+          page: 0,
+          limit: 5
         })
         .then(res => {
           res.status.should.be.equal(200);
-          expect(res.body.length).to.eql(10);
+          expect(res.body.rows.length).to.eql(5);
+          expect(res.body.rows[0].email).to.eql('firstLast1@wolox.com.ar');
+          expect(res.body.rows[4].email).to.eql('firstLast5@wolox.com.ar');
+          expect(res.body.count).to.eql(20);
           dictum.chai(res);
-          done();
+          chai
+            .request(server)
+            .get('/users')
+            .set(token.headerName, token.encode({ email: newUsers[0].email }))
+            .query({
+              page: 1,
+              limit: 5
+            })
+            .then(res2 => {
+              res2.status.should.be.equal(200);
+              expect(res2.body.rows.length).to.eql(5);
+              expect(res2.body.rows[0].email).to.eql('firstLast6@wolox.com.ar');
+              expect(res2.body.rows[4].email).to.eql('firstLast10@wolox.com.ar');
+              expect(res2.body.count).to.eql(20);
+              dictum.chai(res2);
+              done();
+            });
         });
     });
   });
