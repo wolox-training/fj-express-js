@@ -7,13 +7,11 @@ exports.validateToken = (req, res, next) => {
   const token = req.headers[tokens.headerName];
   if (token) {
     const payload = tokens.decode(token);
-    User.findOne({ where: payload }).then(dbUser => {
+    User.findOne({ where: { email: payload.email } }).then(dbUser => {
       if (dbUser) {
         req.user = dbUser;
         next();
       } else {
-        // res.status(401);
-        // res.end();
         next(errors.invalidToken('Invalid token.'));
       }
     });

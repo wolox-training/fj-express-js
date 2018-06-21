@@ -76,11 +76,7 @@ exports.listUsers = (req, res, next) => {
   // TODO
   const lim = req.query.limit || 5;
   const page = req.query.page || 0;
-  User.findAndCountAll({
-    attributes: ['firstName', 'lastName', 'email'],
-    offset: 10 * page,
-    limit: lim
-  }).then(userList => {
-    res.send(userList.rows);
+  return User.getAllNoPassword(page, lim).then(userList => {
+    res.send(userList);
   });
 };
