@@ -74,7 +74,7 @@ exports.signIn = (req, res, next) => {
 
 exports.listUsers = (req, res, next) => {
   const lim = req.query.limit || 5;
-  const page = req.query.page || 0;
+  const page = req.query.page * lim || 0;
   return User.getAllNoPassword(page, lim).then(userList => {
     res.send(userList);
   });

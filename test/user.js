@@ -301,15 +301,35 @@ describe('/users GET', () => {
         .get('/users')
         .set(token.headerName, token.encode({ email: newUsers[0].email }))
         .query({
-          page: 1,
-          limit: 10
+          page: 0,
+          limit: 5
         })
         .then(res => {
           res.status.should.be.equal(200);
-          expect(res.body.rows.length).to.eql(10);
+          expect(res.body.rows.length).to.eql(5);
+          logger.info(res.body.rows);
+          expect(res.body.rows[0].email).to.eql('firstLast1@wolox.com.ar');
+          expect(res.body.rows[4].email).to.eql('firstLast5@wolox.com.ar');
           expect(res.body.count).to.eql(20);
           dictum.chai(res);
-          done();
+          chai
+            .request(server)
+            .get('/users')
+            .set(token.headerName, token.encode({ email: newUsers[0].email }))
+            .query({
+              page: 1,
+              limit: 5
+            })
+            .then(res2 => {
+              res2.status.should.be.equal(200);
+              expect(res2.body.rows.length).to.eql(5);
+              logger.info(res2.body.rows);
+              expect(res2.body.rows[0].email).to.eql('firstLast6@wolox.com.ar');
+              expect(res2.body.rows[4].email).to.eql('firstLast10@wolox.com.ar');
+              expect(res2.body.count).to.eql(20);
+              dictum.chai(res2);
+              done();
+            });
         });
     });
   });
