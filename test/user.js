@@ -3,6 +3,7 @@ const chai = require('chai'),
   server = require('./../app'),
   logger = require('../app/logger'),
   User = require('../app/models').Users,
+  factory = require('./testFactory').factory,
   token = require('../app/services/tokenSessions'),
   should = chai.should(),
   expect = require('chai').expect;
@@ -252,5 +253,82 @@ describe('/users/sessions POST', () => {
         dictum.chai(res);
         done();
       });
+  });
+});
+
+describe('/users GET', () => {
+  it('should fail because session has no token', done => {
+    chai
+      .request(server)
+      .get('/users')
+      .query({
+        page: 1,
+        limit: 10
+      })
+      .catch(err => {
+        err.should.have.status(401);
+        err.response.body.should.have.property('message');
+        err.response.body.should.have.property('internal_code');
+        expect(err.response.body.message).to.equal('Missing token.');
+        expect(err.response.body.internal_code).to.equal('invalid_token');
+        done();
+      });
+  });
+
+  it('should fail because session is not valid', done => {
+    chai
+      .request(server)
+      .get('/users')
+      .set(token.headerName, token.encode({ email: 'all your base belong to us' }))
+      .query({
+        page: 1,
+        limit: 10
+      })
+      .catch(err => {
+        err.should.have.status(401);
+        err.response.body.should.have.property('message');
+        err.response.body.should.have.property('internal_code');
+        expect(err.response.body.message).to.equal('Invalid token.');
+        expect(err.response.body.internal_code).to.equal('invalid_token');
+        done();
+      });
+  });
+
+  it('should be successful', done => {
+    factory.createMany('user', 20).then(newUsers => {
+      chai
+        .request(server)
+        .get('/users')
+        .set(token.headerName, token.encode({ email: newUsers[0].email }))
+        .query({
+          page: 0,
+          limit: 5
+        })
+        .then(res => {
+          res.status.should.be.equal(200);
+          expect(res.body.rows.length).to.eql(5);
+          expect(res.body.rows[0].email).to.eql('firstLast1@wolox.com.ar');
+          expect(res.body.rows[4].email).to.eql('firstLast5@wolox.com.ar');
+          expect(res.body.count).to.eql(20);
+          dictum.chai(res);
+          chai
+            .request(server)
+            .get('/users')
+            .set(token.headerName, token.encode({ email: newUsers[0].email }))
+            .query({
+              page: 1,
+              limit: 5
+            })
+            .then(res2 => {
+              res2.status.should.be.equal(200);
+              expect(res2.body.rows.length).to.eql(5);
+              expect(res2.body.rows[0].email).to.eql('firstLast6@wolox.com.ar');
+              expect(res2.body.rows[4].email).to.eql('firstLast10@wolox.com.ar');
+              expect(res2.body.count).to.eql(20);
+              dictum.chai(res2);
+              done();
+            });
+        });
+    });
   });
 });

@@ -74,5 +74,14 @@ module.exports = (sequelize, DataTypes) => {
       throw errors.databaseError(err.message);
     });
 
+  User.getAllNoPassword = (offset, limit) =>
+    User.findAndCountAll({
+      attributes: ['firstName', 'lastName', 'email'],
+      offset,
+      limit
+    }).catch(err => {
+      throw errors.databaseError(err.message);
+    });
+
   return User;
 };
