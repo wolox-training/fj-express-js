@@ -387,27 +387,27 @@ describe('/admin/users POST', () => {
   });
 
   it('should be successful (granting permission)', done => {
-    factory.create('user').then(user => {
-      factory.create('admin').then(admin => {
-        chai
-          .request(server)
-          .post('/admin/users')
-          .set(token.headerName, token.encode({ email: admin.email }))
-          .send({
-            firstName: user.firstName,
-            lastName: user.lastName,
-            password: 'password',
-            email: user.email
-          })
-          .then(res => {
-            expect(res.status).to.equal(201);
-            User.findOne({ where: { email: user.email } }).then(dbUser => {
-              expect(dbUser.isAdmin).to.eql(true);
-              dictum.chai(res);
-              done();
-            });
+    const user = factory.create('user');
+    const admin = factory.create('admin');
+    Promise.all([user, admin]).then(values => {
+      chai
+        .request(server)
+        .post('/admin/users')
+        .set(token.headerName, token.encode({ email: values[1].email }))
+        .send({
+          firstName: values[0].firstName,
+          lastName: values[0].lastName,
+          password: 'password',
+          email: values[0].email
+        })
+        .then(res => {
+          expect(res.status).to.equal(201);
+          User.findOne({ where: { email: values[0].email } }).then(dbUser => {
+            expect(dbUser.isAdmin).to.eql(true);
+            dictum.chai(res);
+            done();
           });
-      });
+        });
     });
   });
 
