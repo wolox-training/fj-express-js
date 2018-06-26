@@ -45,21 +45,13 @@ exports.newUser = (req, res, next) =>
 exports.newAdmin = (req, res, next) =>
   newUserObject(req.body)
     .then(admin => {
-      return User.findOne({ where: { email: admin.email } })
-        .then(result => {
-          if (result) {
-            result.isAdmin = true;
-            result.save().then(oldAdmin => {
-              logger.info(`Successfully granted admin status to user.`);
-              res.status(201).end();
-            });
-          } else {
-            admin.isAdmin = true;
-            User.createModel(admin).then(newAdmin => {
-              logger.info(`Successfully created new admin.`);
-              res.status(201).end();
-            });
-          }
+      admin.isAdmin = true;
+      return User.upsert(admin)
+        .then(created => {
+          created
+            ? logger.info(`Successfully created new admin.`)
+            : logger.info(`Successfully granted admin status to user.`);
+          res.status(201).end();
         })
         .catch(err => {
           next(errors.databaseError(err.message));
