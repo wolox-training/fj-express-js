@@ -46,16 +46,12 @@ exports.newAdmin = (req, res, next) =>
   newUserObject(req.body)
     .then(admin => {
       admin.isAdmin = true;
-      return User.upsert(admin)
-        .then(created => {
-          created
-            ? logger.info(`Successfully created new admin.`)
-            : logger.info(`Successfully granted admin status to user.`);
-          res.status(201).end();
-        })
-        .catch(err => {
-          next(errors.databaseError(err.message));
-        });
+      return User.upsertAndCatch(admin).then(created => {
+        created
+          ? logger.info(`Successfully created new admin.`)
+          : logger.info(`Successfully granted admin status to user.`);
+        res.status(201).end();
+      });
     })
     .catch(next);
 
@@ -88,16 +84,16 @@ exports.signIn = (req, res, next) => {
           next(errors.invalidUser('There is no user registered with that email.'));
         }
       })
-      .catch(err => {
-        next(errors.databaseError(err.message));
-      });
+      .catch(next);
   }
 };
 
 exports.listUsers = (req, res, next) => {
   const lim = req.query.limit || 5;
   const page = req.query.page * lim || 0;
-  return User.getAllNoPassword(page, lim).then(userList => {
-    res.send(userList);
-  });
+  return User.getAllNoPassword(page, lim)
+    .then(userList => {
+      res.send(userList);
+    })
+    .catch(next);
 };

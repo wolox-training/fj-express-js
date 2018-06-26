@@ -88,5 +88,10 @@ module.exports = (sequelize, DataTypes) => {
       throw errors.databaseError(err.message);
     });
 
+  User.upsertAndCatch = object =>
+    User.upsert(object).catch(err => {
+      throw errors.databaseError(err.message);
+    });
+
   return User;
 };
