@@ -1,16 +1,20 @@
-/* 'use strict';
+'use strict';
 
 const logger = require('../logger'),
   validation = require('./validation'),
   tokens = require('./../services/tokenSessions'),
   bcrypt = require('bcryptjs'),
   errors = require('../errors'),
-  fetch = require('node-fetch');
+  rp = require('request-promise');
 
 exports.getAlbums = (req, res, next) => {
   logger.info('GET Albums');
-  fetch('https://jsonplaceholder.typicode.com/albums')
-    .then(response => response.json())
-    .then(json => console.log(json));
-  res.status(201).end();
-}; */
+  rp({
+    uri: 'https://jsonplaceholder.typicode.com/albums',
+    json: true
+  })
+    .then(response => {
+      res.send(response);
+    })
+    .catch(err => next(errors.fetchError(err.message)));
+};

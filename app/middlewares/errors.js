@@ -8,6 +8,7 @@ const statusCodes = {
   [errors.BOOK_NOT_FOUND]: 404,
   [errors.SAVING_ERROR]: 400,
   [errors.INVALID_TOKEN]: 401,
+  [errors.FETCH_ERROR]: 404,
   [errors.DATABASE_ERROR]: 503,
   [errors.DEFAULT_ERROR]: 500
 };
