@@ -61,7 +61,7 @@ module.exports = (sequelize, DataTypes) => {
 
   User.createModel = user =>
     User.create(user).catch(err => {
-      throw errors.databaseError(err.message);
+      throw errors.savingError(err.message);
     });
 
   User.getAll = user =>
@@ -69,7 +69,10 @@ module.exports = (sequelize, DataTypes) => {
       throw errors.databaseError(err.message);
     });
 
-  User.getAllWhere = where => User.findAll({ where });
+  User.getAllWhere = where =>
+    User.findAll({ where }).catch(err => {
+      throw errors.databaseError(err.message);
+    });
 
   User.getOneWhere = (attributes, where) =>
     User.findOne({
@@ -88,9 +91,9 @@ module.exports = (sequelize, DataTypes) => {
       throw errors.databaseError(err.message);
     });
 
-  User.upsertAndCatch = object =>
+  User.upsertUser = object =>
     User.upsert(object).catch(err => {
-      throw errors.databaseError(err.message);
+      throw errors.savingError(err.message);
     });
 
   return User;

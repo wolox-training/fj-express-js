@@ -36,9 +36,7 @@ exports.newUser = (req, res, next) =>
           logger.info(`Successfully created new user. Welcome, ${newUser.firstName} ${newUser.lastName}!`);
           res.status(201).end();
         })
-        .catch(err => {
-          next(errors.savingError(err.message));
-        });
+        .catch(next);
     })
     .catch(next);
 
@@ -46,7 +44,7 @@ exports.newAdmin = (req, res, next) =>
   newUserObject(req.body)
     .then(admin => {
       admin.isAdmin = true;
-      return User.upsertAndCatch(admin).then(created => {
+      return User.upsertUser(admin).then(created => {
         created
           ? logger.info(`Successfully created new admin.`)
           : logger.info(`Successfully granted admin status to user.`);
