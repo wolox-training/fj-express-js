@@ -5,7 +5,7 @@ const logger = require('../logger'),
   tokens = require('./../services/tokenSessions'),
   bcrypt = require('bcryptjs'),
   errors = require('../errors'),
-  User = require('../models').Users,
+  User = require('../models').user,
   saltRounds = 10;
 
 const newUserObject = body => {

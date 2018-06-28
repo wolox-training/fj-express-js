@@ -3,7 +3,7 @@
 // User migration
 module.exports = {
   up: (queryInterface, DataTypes) =>
-    queryInterface.createTable('Users', {
+    queryInterface.createTable('users', {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,

@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, DataTypes) =>
-    queryInterface.addColumn('Users', 'isAdmin', DataTypes.BOOLEAN, {
+    queryInterface.addColumn('users', 'isAdmin', DataTypes.BOOLEAN, {
       allowNull: false,
       after: 'password'
     }),

@@ -5,7 +5,7 @@ const errors = require('../errors');
 const emptyValidation = field => `The ${field} field cannot be empty. Please try again.`;
 
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('Users', {
+  const User = sequelize.define('user', {
     firstName: {
       type: DataTypes.STRING,
       allowNull: {
@@ -58,6 +58,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     }
   });
+
+  User.associate = models => {
+    User.belongsToMany(models.album, { through: 'UserAlbum' });
+  };
 
   User.createModel = user =>
     User.create(user).catch(err => {
