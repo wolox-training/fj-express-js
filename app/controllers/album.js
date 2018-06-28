@@ -35,8 +35,22 @@ exports.purchaseAlbum = (req, res, next) => {
           title: album.title
         })
           .spread((dbAlbum, created) => {
-            console.log(Object.keys(dbAlbum));
-            res.send(created);
+            dbAlbum.getUsers({ attributes: ['email'] }).then(owners => {
+              const found = owners.find(element => {
+                return element.email === req.user.email;
+              });
+              if (found) {
+                next(errors.invalidUser('User has already purchased this album.'));
+              } else {
+                dbAlbum.addUser(req.user);
+                logger.info(
+                  `User ${req.user.firstName} ${req.user.lastName} has successfully purchased album #${
+                    album.id
+                  }`
+                );
+                res.status(201).end();
+              }
+            });
           })
           .catch(next);
       } else {
