@@ -4,10 +4,48 @@ const chai = require('chai'),
   logger = require('../app/logger'),
   factory = require('./testFactory').factory,
   nock = require('nock'),
-  testNock = require('./nockResponses'),
   token = require('../app/services/tokenSessions'),
   should = chai.should(),
   expect = require('chai').expect;
+
+const album404 = () => {
+  nock('https://jsonplaceholder.typicode.com')
+    .get('/albums')
+    .reply(404);
+};
+
+const albumSuccess = persist => {
+  const success = nock('https://jsonplaceholder.typicode.com')
+    .persist(persist)
+    .get('/albums')
+    .reply(200, [
+      {
+        userId: 1,
+        id: 1,
+        title: 'quidem molestiae enim'
+      },
+      {
+        userId: 1,
+        id: 2,
+        title: 'sunt qui excepturi placeat culpa'
+      },
+      {
+        userId: 1,
+        id: 3,
+        title: 'omnis laborum odio'
+      },
+      {
+        userId: 1,
+        id: 4,
+        title: 'non esse culpa molestiae omnis sed optio'
+      },
+      {
+        userId: 1,
+        id: 5,
+        title: 'eaque aut omnis a'
+      }
+    ]);
+};
 
 describe('/albums GET', () => {
   it('should fail because session has no token', done => {
@@ -40,9 +78,8 @@ describe('/albums GET', () => {
   });
 
   before(() => {
-    const album404 = nock('https://jsonplaceholder.typicode.com')
-      .get('/albums')
-      .reply(404);
+    nock.cleanAll();
+    album404();
   });
 
   it('should fail because external service is unavailable', done => {
@@ -66,35 +103,7 @@ describe('/albums GET', () => {
   });
 
   before(() => {
-    const success = nock('https://jsonplaceholder.typicode.com')
-      .get('/albums')
-      .reply(200, [
-        {
-          userId: 1,
-          id: 1,
-          title: 'quidem molestiae enim'
-        },
-        {
-          userId: 1,
-          id: 2,
-          title: 'sunt qui excepturi placeat culpa'
-        },
-        {
-          userId: 1,
-          id: 3,
-          title: 'omnis laborum odio'
-        },
-        {
-          userId: 1,
-          id: 4,
-          title: 'non esse culpa molestiae omnis sed optio'
-        },
-        {
-          userId: 1,
-          id: 5,
-          title: 'eaque aut omnis a'
-        }
-      ]);
+    albumSuccess(false);
   });
 
   it('should be successful', done => {
@@ -149,9 +158,7 @@ describe('/albums/:id POST', () => {
 
   before(() => {
     nock.cleanAll();
-    const album4042 = nock('https://jsonplaceholder.typicode.com')
-      .get('/albums')
-      .reply(404);
+    album404();
   });
 
   it('should fail because external service is unavailable', done => {
@@ -175,36 +182,7 @@ describe('/albums/:id POST', () => {
   });
 
   before(() => {
-    const success2 = nock('https://jsonplaceholder.typicode.com')
-      .persist()
-      .get('/albums')
-      .reply(200, [
-        {
-          userId: 1,
-          id: 1,
-          title: 'quidem molestiae enim'
-        },
-        {
-          userId: 1,
-          id: 2,
-          title: 'sunt qui excepturi placeat culpa'
-        },
-        {
-          userId: 1,
-          id: 3,
-          title: 'omnis laborum odio'
-        },
-        {
-          userId: 1,
-          id: 4,
-          title: 'non esse culpa molestiae omnis sed optio'
-        },
-        {
-          userId: 1,
-          id: 5,
-          title: 'eaque aut omnis a'
-        }
-      ]);
+    albumSuccess();
   });
 
   it('should fail because external album does not exist', done => {
