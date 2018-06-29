@@ -5,23 +5,29 @@ const logger = require('../logger'),
   errors = require('../errors'),
   rp = require('request-promise');
 
-exports.getAlbums = (req, res, next) => {
-  logger.info('GET Albums');
-  rp({
+const pingAlbums = () => {
+  return rp({
     uri: 'https://jsonplaceholder.typicode.com/albums',
     json: true
   })
     .then(response => {
+      return response;
+    })
+    .catch(err => {
+      throw errors.fetchError(err.message);
+    });
+};
+
+exports.getAlbums = (req, res, next) => {
+  pingAlbums()
+    .then(response => {
       res.send(response);
     })
-    .catch(err => next(errors.fetchError(err.message)));
+    .catch(next);
 };
 
 exports.purchaseAlbum = (req, res, next) => {
-  rp({
-    uri: 'https://jsonplaceholder.typicode.com/albums',
-    json: true
-  })
+  pingAlbums()
     .then(response => {
       const albumId = Number(req.params.id);
       if (!albumId) next(errors.albumNotFound('Missing album ID.'));
@@ -35,11 +41,8 @@ exports.purchaseAlbum = (req, res, next) => {
           title: album.title
         })
           .spread((dbAlbum, created) => {
-            dbAlbum.getUsers({ attributes: ['email'] }).then(owners => {
-              const found = owners.find(element => {
-                return element.email === req.user.email;
-              });
-              if (found) {
+            dbAlbum.getUsers({ where: { email: req.user.email } }).then(owner => {
+              if (owner.length) {
                 next(errors.invalidUser('User has already purchased this album.'));
               } else {
                 dbAlbum.addUser(req.user);
@@ -57,5 +60,5 @@ exports.purchaseAlbum = (req, res, next) => {
         next(errors.albumNotFound('Requested album does not exist or is not available.'));
       }
     })
-    .catch(err => next(errors.fetchError(err.message)));
+    .catch(next);
 };
