@@ -1,7 +1,7 @@
 const rp = require('request-promise'),
   errors = require('../errors.js');
 
-const pingAlbums = () => {
+exports.pingAlbums = () => {
   return rp({
     uri: 'https://jsonplaceholder.typicode.com/albums',
     json: true
