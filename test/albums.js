@@ -114,6 +114,10 @@ describe('/albums GET', () => {
 });
 
 describe('/albums/:id POST', () => {
+  afterEach(() => {
+    factory.cleanUp();
+  });
+
   it('should fail because session has no token', done => {
     chai
       .request(server)
@@ -172,6 +176,7 @@ describe('/albums/:id POST', () => {
 
   before(() => {
     const success2 = nock('https://jsonplaceholder.typicode.com')
+      .persist()
       .get('/albums')
       .reply(200, [
         {
@@ -202,7 +207,24 @@ describe('/albums/:id POST', () => {
       ]);
   });
 
-  /* it('should fail because user purchased the same album twice', done => {
+  it('should fail because external album does not exist', done => {
+    factory.create('user').then(user => {
+      chai
+        .request(server)
+        .post('/albums/101')
+        .set(token.headerName, token.encode({ email: user.email }))
+        .catch(err => {
+          err.should.have.status(404);
+          err.response.body.should.have.property('message');
+          err.response.body.should.have.property('internal_code');
+          expect(err.response.body.internal_code).to.equal('album_not_found');
+          expect(err.response.body.message).to.equal('Requested album does not exist or is not available.');
+          done();
+        });
+    });
+  });
+
+  it('should fail because user purchased the same album twice', done => {
     factory.create('user').then(user => {
       chai
         .request(server)
@@ -214,7 +236,7 @@ describe('/albums/:id POST', () => {
             .post('/albums/1')
             .set(token.headerName, token.encode({ email: user.email }))
             .catch(err => {
-              err.should.have.status(404);
+              err.should.have.status(400);
               err.response.body.should.have.property('message');
               err.response.body.should.have.property('internal_code');
               expect(err.response.body.internal_code).to.equal('invalid_user');
@@ -223,7 +245,7 @@ describe('/albums/:id POST', () => {
             });
         });
     });
-  }); */
+  });
 
   it('should be successful', done => {
     factory.create('user').then(user => {
