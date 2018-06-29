@@ -20,3 +20,6 @@ exports.invalidToken = message => internalError(message, exports.INVALID_TOKEN);
 
 exports.DATABASE_ERROR = 'database_error';
 exports.databaseError = message => internalError(message, exports.DATABASE_ERROR);
+
+exports.FETCH_ERROR = 'fetch_error';
+exports.fetchError = message => internalError(message, exports.FETCH_ERROR);

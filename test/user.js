@@ -258,6 +258,9 @@ describe('/users/sessions POST', () => {
 });
 
 describe('/users GET', () => {
+  afterEach(() => {
+    factory.cleanUp();
+  });
   it('should fail because session has no token', done => {
     chai
       .request(server)
@@ -308,8 +311,6 @@ describe('/users GET', () => {
         .then(res => {
           res.status.should.be.equal(200);
           expect(res.body.rows.length).to.eql(5);
-          expect(res.body.rows[0].email).to.eql('firstLast1@wolox.com.ar');
-          expect(res.body.rows[4].email).to.eql('firstLast5@wolox.com.ar');
           expect(res.body.count).to.eql(20);
           dictum.chai(res);
           chai
@@ -323,8 +324,6 @@ describe('/users GET', () => {
             .then(res2 => {
               res2.status.should.be.equal(200);
               expect(res2.body.rows.length).to.eql(5);
-              expect(res2.body.rows[0].email).to.eql('firstLast6@wolox.com.ar');
-              expect(res2.body.rows[4].email).to.eql('firstLast10@wolox.com.ar');
               expect(res2.body.count).to.eql(20);
               dictum.chai(res2);
               done();

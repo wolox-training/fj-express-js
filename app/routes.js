@@ -1,6 +1,7 @@
 const logger = require('./logger'),
   tokenValidation = require('./middlewares/session'),
-  userFunctions = require('./controllers/user');
+  userFunctions = require('./controllers/user'),
+  albumFunctions = require('./controllers/album');
 
 exports.init = app => {
   app.post('/users', userFunctions.newUser);
@@ -11,4 +12,5 @@ exports.init = app => {
     userFunctions.newAdmin
   );
   app.post('/users/sessions', userFunctions.signIn);
+  app.get('/albums', [tokenValidation.validateToken], albumFunctions.getAlbums);
 };
