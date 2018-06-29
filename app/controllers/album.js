@@ -3,11 +3,11 @@
 const logger = require('../logger'),
   Album = require('../models').album,
   errors = require('../errors'),
-  requests = require('../services/requests');
+  requests = require('../services/albums');
 
 exports.getAlbums = (req, res, next) => {
   requests
-    .pingAlbums()
+    .getAlbums()
     .then(response => {
       res.send(response);
     })
@@ -16,7 +16,7 @@ exports.getAlbums = (req, res, next) => {
 
 exports.purchaseAlbum = (req, res, next) => {
   requests
-    .pingAlbums()
+    .getAlbums()
     .then(response => {
       const albumId = Number(req.params.id);
       if (!albumId) next(errors.albumNotFound('Missing album ID.'));
