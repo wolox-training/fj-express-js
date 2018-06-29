@@ -3,23 +3,11 @@
 const logger = require('../logger'),
   Album = require('../models').album,
   errors = require('../errors'),
-  rp = require('request-promise');
-
-const pingAlbums = () => {
-  return rp({
-    uri: 'https://jsonplaceholder.typicode.com/albums',
-    json: true
-  })
-    .then(response => {
-      return response;
-    })
-    .catch(err => {
-      throw errors.fetchError(err.message);
-    });
-};
+  requests = require('../services/requests');
 
 exports.getAlbums = (req, res, next) => {
-  pingAlbums()
+  requests
+    .pingAlbums()
     .then(response => {
       res.send(response);
     })
@@ -27,7 +15,8 @@ exports.getAlbums = (req, res, next) => {
 };
 
 exports.purchaseAlbum = (req, res, next) => {
-  pingAlbums()
+  requests
+    .pingAlbums()
     .then(response => {
       const albumId = Number(req.params.id);
       if (!albumId) next(errors.albumNotFound('Missing album ID.'));
