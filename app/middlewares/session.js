@@ -19,3 +19,11 @@ exports.validateToken = (req, res, next) => {
     next(errors.invalidToken('Missing token.'));
   }
 };
+
+exports.validateAdmin = (req, res, next) => {
+  if (!req.user.isAdmin) {
+    next(errors.invalidUser('User does not have access to this resource.'));
+  } else {
+    next();
+  }
+};
