@@ -1,7 +1,7 @@
 const rp = require('request-promise'),
   errors = require('../errors.js');
 
-exports.pingAlbums = () => {
+exports.getAlbums = () => {
   return rp({
     uri: 'https://jsonplaceholder.typicode.com/albums',
     json: true
