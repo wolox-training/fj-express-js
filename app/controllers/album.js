@@ -1,6 +1,7 @@
 'use strict';
 
 const logger = require('../logger'),
+  User = require('../models').user,
   Album = require('../models').album,
   errors = require('../errors'),
   requests = require('../services/albums');
@@ -50,4 +51,26 @@ exports.purchaseAlbum = (req, res, next) => {
       }
     })
     .catch(next);
+};
+
+exports.userAlbums = (req, res, next) => {
+  const userId = Number(req.params.user_id);
+  if (req.user.isAdmin || req.user.id === userId) {
+    User.getOneWhere(null, { id: userId })
+      .then(user => {
+        if (user) {
+          user
+            .getAlbums()
+            .then(albums => {
+              res.send(albums);
+            })
+            .catch(err => next(errors.databaseError(err.message)));
+        } else {
+          next(errors.invalidUser(`User with id ${userId} does not exist`));
+        }
+      })
+      .catch(next);
+  } else {
+    next(errors.invalidUser('User does not have access to other users catalogs'));
+  }
 };
