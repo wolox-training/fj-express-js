@@ -19,7 +19,7 @@ exports.purchaseAlbum = (req, res, next) => {
   requests
     .getAlbums()
     .then(response => {
-      const albumId = Number(req.params.id);
+      const albumId = parseInt(req.params.id);
       if (!albumId) next(errors.albumNotFound('Missing album ID.'));
       const album = response.find(element => {
         return element.id === albumId;
@@ -54,7 +54,7 @@ exports.purchaseAlbum = (req, res, next) => {
 };
 
 exports.userAlbums = (req, res, next) => {
-  const userId = Number(req.params.user_id);
+  const userId = parseInt(req.params.user_id);
   if (req.user.isAdmin || req.user.id === userId) {
     User.getOneWhere(null, { id: userId })
       .then(user => {
