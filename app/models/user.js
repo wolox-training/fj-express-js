@@ -59,10 +59,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
 
-  User.associate = models => {
-    User.belongsToMany(models.album, { through: 'UserAlbum' });
-  };
-
   User.createModel = user =>
     User.create(user).catch(err => {
       throw errors.savingError(err.message);
