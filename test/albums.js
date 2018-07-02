@@ -5,6 +5,7 @@ const chai = require('chai'),
   factory = require('./testFactory').factory,
   nock = require('nock'),
   token = require('../app/services/tokenSessions'),
+  UserAlbum = require('../app/models').useralbum,
   should = chai.should(),
   expect = require('chai').expect;
 
@@ -218,7 +219,7 @@ describe('/albums/:id POST', () => {
               err.response.body.should.have.property('message');
               err.response.body.should.have.property('internal_code');
               expect(err.response.body.internal_code).to.equal('invalid_user');
-              expect(err.response.body.message).to.equal('User has already purchased this album.');
+              expect(err.response.body.message).to.equal('User cannot purchase the same album twice.');
               done();
             });
         });
@@ -229,12 +230,15 @@ describe('/albums/:id POST', () => {
     factory.create('user').then(user => {
       chai
         .request(server)
-        .post('/albums/1')
+        .post('/albums/5')
         .set(token.headerName, token.encode({ email: user.email }))
         .then(res => {
           expect(res.status).to.equal(201);
-          dictum.chai(res);
-          done();
+          UserAlbum.findOne({ where: { userId: 1 } }).then(album => {
+            expect(album.albumId).to.equal(5);
+            dictum.chai(res);
+            done();
+          });
         });
     });
   });
