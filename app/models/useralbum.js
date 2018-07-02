@@ -6,13 +6,11 @@ module.exports = (sequelize, DataTypes) => {
   const UserAlbum = sequelize.define('useralbum', {
     userId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      unique: 'compositeIndex'
+      allowNull: false
     },
     albumId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      unique: 'compositeIndex'
+      allowNull: false
     }
   });
 
