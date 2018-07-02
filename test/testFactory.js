@@ -1,6 +1,6 @@
 const factory = require('factory-girl').factory,
   bcrypt = require('bcryptjs'),
-  User = require('../app/models').Users;
+  User = require('../app/models').user;
 
 const hashed = bcrypt.hashSync('password', 10);
 

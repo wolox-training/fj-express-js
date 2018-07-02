@@ -3,7 +3,7 @@
 // User migration
 module.exports = {
   up: (queryInterface, DataTypes) =>
-    queryInterface.createTable('Users', {
+    queryInterface.createTable('users', {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -37,5 +37,5 @@ module.exports = {
       }
     }),
 
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('Users')
+  down: (queryInterface, Sequelize) => queryInterface.dropTable('users')
 };

@@ -1,5 +1,5 @@
 const tokens = require('../services/tokenSessions'),
-  User = require('../models').Users,
+  User = require('../models').user,
   logger = require('../logger'),
   errors = require('../errors');
 

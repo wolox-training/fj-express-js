@@ -9,8 +9,8 @@ exports.defaultError = message => internalError(message, exports.DEFAULT_ERROR);
 exports.INVALID_USER = 'invalid_user';
 exports.invalidUser = message => internalError(message, exports.INVALID_USER);
 
-exports.BOOK_NOT_FOUND = 'book_not_found';
-exports.bookNotFound = message => internalError(message, exports.BOOK_NOT_FOUND);
+exports.ALBUM_NOT_FOUND = 'album_not_found';
+exports.albumNotFound = message => internalError(message, exports.ALBUM_NOT_FOUND);
 
 exports.SAVING_ERROR = 'saving_error';
 exports.savingError = message => internalError(message, exports.SAVING_ERROR);
