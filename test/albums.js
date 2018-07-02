@@ -241,8 +241,8 @@ describe('/albums/:id POST', () => {
               err.should.have.status(400);
               err.response.body.should.have.property('message');
               err.response.body.should.have.property('internal_code');
-              expect(err.response.body.internal_code).to.equal('saving_error');
-              expect(err.response.body.message).to.equal('Validation error');
+              expect(err.response.body.internal_code).to.equal('invalid_user');
+              expect(err.response.body.message).to.equal('User cannot purchase album twice.');
               done();
             });
         });

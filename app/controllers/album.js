@@ -20,15 +20,20 @@ exports.purchaseAlbum = (req, res, next) => {
   if (!albumId) next(errors.albumNotFound('Missing album ID.'));
   requests
     .getAlbum(`/${albumId}`)
-    .then(response => {
-      const album = response;
+    .then(album => {
       if (album) {
         UserAlbum.createModel(req.user.id, albumId)
           .then(() => {
             logger.info(`User #${req.user.id} bought album #${albumId}`);
             res.status(201).end();
           })
-          .catch(next);
+          .catch(err => {
+            if (err.message === 'Validation error') {
+              next(errors.invalidUser('User cannot purchase album twice.'));
+            } else {
+              next(err);
+            }
+          });
       } else {
         next(errors.albumNotFound('Requested album does not exist or is not available.'));
       }
