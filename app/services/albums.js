@@ -42,7 +42,7 @@ exports.getUserAlbums = id => {
 
 exports.getAlbumPhotos = id => {
   return rp({
-    uri: `https://jsonplaceholder.typicode.com/photos?albumId=${id}`,
+    uri: `https://jsonplaceholder.typicode.com/album/${id}/photos`,
     json: true
   })
     .then(response => {
