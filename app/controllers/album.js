@@ -41,18 +41,10 @@ exports.userAlbums = (req, res, next) => {
     User.getOneWhere(null, { id: userId })
       .then(user => {
         if (user) {
-          UserAlbum.getAlbums(user.id)
+          requests
+            .getUserAlbums(user.id)
             .then(albums => {
-              const albumArray = [];
-              albums.forEach(element =>
-                requests
-                  .getAlbum(`/${element.albumId}`)
-                  .then(albumData => {
-                    albumArray.push(albumData);
-                  })
-                  .catch(next)
-              );
-              res.send(albumArray);
+              res.send(albums);
             })
             .catch(next);
         } else {

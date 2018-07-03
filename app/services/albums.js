@@ -1,5 +1,6 @@
 const rp = require('request-promise'),
-  errors = require('../errors');
+  errors = require('../errors'),
+  UserAlbum = require('../models').useralbum;
 
 exports.getAlbums = () => {
   return rp({
@@ -26,3 +27,14 @@ exports.getAlbum = route => {
       throw errors.fetchError(err.message);
     });
 };
+
+exports.getUserAlbums = id =>
+  UserAlbum.getAlbums(id)
+    .then(albums => {
+      const albumArray = [];
+      albums.forEach(element => albumArray.push(exports.getAlbum(`/${element.albumId}`)));
+      return Promise.all(albumArray);
+    })
+    .catch(err => {
+      throw err;
+    });

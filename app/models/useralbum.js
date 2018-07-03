@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
   UserAlbum.getAlbums = userId =>
-    UserAlbum.findOne({ attributes: ['albumId'], where: { userId } }).catch(err => {
+    UserAlbum.findAll({ attributes: ['albumId'], where: { userId } }).catch(err => {
       throw errors.databaseError(err.message);
     });
 
