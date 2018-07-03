@@ -27,16 +27,32 @@ exports.purchaseAlbum = (req, res, next) => {
             logger.info(`User #${req.user.id} bought album #${albumId}`);
             res.status(201).end();
           })
-          .catch(err => {
-            if (err.message === 'Validation error') {
-              next(errors.invalidUser('User cannot purchase album twice.'));
-            } else {
-              next(err);
-            }
-          });
+          .catch(next);
       } else {
         next(errors.albumNotFound('Requested album does not exist or is not available.'));
       }
     })
     .catch(next);
+};
+
+exports.userAlbums = (req, res, next) => {
+  const userId = parseInt(req.params.user_id);
+  if (req.user.isAdmin || req.user.id === userId) {
+    return User.getOneWhere(null, { id: userId })
+      .then(user => {
+        if (user) {
+          return requests
+            .getUserAlbums(user.id)
+            .then(albums => {
+              res.send(albums);
+            })
+            .catch(next);
+        } else {
+          next(errors.invalidUser(`User with id ${userId} does not exist`));
+        }
+      })
+      .catch(next);
+  } else {
+    next(errors.invalidUser('User does not have access to other users catalogs'));
+  }
 };

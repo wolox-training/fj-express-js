@@ -1,4 +1,24 @@
-<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" /><script src="https://code.jquery.com/jquery-1.12.2.min.js"></script><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script><style> pre { width: 95%; } </style></head><body><div class="container"><div class="jumbotron"><h1>Users</h1></div><div class="panel panel-default"><div class="panel-heading" role="tab" id="heading-users-POST"><h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapse-users-POST" href="#collapse-users-POST">POST /users</a></h4></div><div id="collapse-users-POST" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-users-POST"><div class="panel-body"><h4>Request Data</h4><div class="container"><h5>Headers</h5><pre>{
+<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" /><script src="https://code.jquery.com/jquery-1.12.2.min.js"></script><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script><style> pre { width: 95%; } </style></head><body><div class="container"><div class="jumbotron"><h1>Users</h1></div><div class="panel panel-default"><div class="panel-heading" role="tab" id="heading-users-1-albums-GET"><h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapse-users-1-albums-GET" href="#collapse-users-1-albums-GET">GET /users/1/albums</a></h4></div><div id="collapse-users-1-albums-GET" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-users-1-albums-GET"><div class="panel-body"><h4>Request Data</h4><div class="container"><h5>Headers</h5><pre>{
+  "authorization": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImZpcnN0TGFzdDFAd29sb3guY29tLmFyIn0.ojceQUs9UoeTbDS97UTxsQNgi7Hx2HKWMwp2S4zkbmY"
+}</pre></div></div><div class="panel-body"><h4>Response Data</h4><div class="container"><h5>Status: 200</h5><h5>Headers</h5><pre>{
+  "authorization": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImZpcnN0TGFzdDFAd29sb3guY29tLmFyIn0.ojceQUs9UoeTbDS97UTxsQNgi7Hx2HKWMwp2S4zkbmY"
+}</pre><h5>Body</h5><pre>[
+  {
+    "userId": 1,
+    "id": 1,
+    "title": "quidem molestiae enim"
+  }
+]</pre></div></div></div></div><div class="panel panel-default"><div class="panel-heading" role="tab" id="heading-users-2-albums-GET"><h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapse-users-2-albums-GET" href="#collapse-users-2-albums-GET">GET /users/2/albums</a></h4></div><div id="collapse-users-2-albums-GET" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-users-2-albums-GET"><div class="panel-body"><h4>Request Data</h4><div class="container"><h5>Headers</h5><pre>{
+  "authorization": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImFkbWluZ3V5MUB3b2xveC5jb20uYXIifQ.7Jr3mPC1zJA4JskCpxWmcTkvuAJ2diN_DMyk8QK_wKQ"
+}</pre></div></div><div class="panel-body"><h4>Response Data</h4><div class="container"><h5>Status: 200</h5><h5>Headers</h5><pre>{
+  "authorization": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImFkbWluZ3V5MUB3b2xveC5jb20uYXIifQ.7Jr3mPC1zJA4JskCpxWmcTkvuAJ2diN_DMyk8QK_wKQ"
+}</pre><h5>Body</h5><pre>[
+  {
+    "userId": 1,
+    "id": 1,
+    "title": "quidem molestiae enim"
+  }
+]</pre></div></div></div></div><div class="panel panel-default"><div class="panel-heading" role="tab" id="heading-users-POST"><h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapse-users-POST" href="#collapse-users-POST">POST /users</a></h4></div><div id="collapse-users-POST" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-users-POST"><div class="panel-body"><h4>Request Data</h4><div class="container"><h5>Headers</h5><pre>{
   "content-type": "application/json",
   "content-length": 99
 }</pre><h5>Body</h5><pre>{
@@ -26,14 +46,9 @@
   "count": 20,
   "rows": [
     {
-      "firstName": "firstName1",
-      "lastName": "lastName1",
-      "email": "firstLast1@wolox.com.ar"
-    },
-    {
-      "firstName": "firstName4",
-      "lastName": "lastName4",
-      "email": "firstLast4@wolox.com.ar"
+      "firstName": "firstName2",
+      "lastName": "lastName2",
+      "email": "firstLast2@wolox.com.ar"
     },
     {
       "firstName": "firstName3",
@@ -46,9 +61,14 @@
       "email": "firstLast5@wolox.com.ar"
     },
     {
-      "firstName": "firstName2",
-      "lastName": "lastName2",
-      "email": "firstLast2@wolox.com.ar"
+      "firstName": "firstName7",
+      "lastName": "lastName7",
+      "email": "firstLast7@wolox.com.ar"
+    },
+    {
+      "firstName": "firstName9",
+      "lastName": "lastName9",
+      "email": "firstLast9@wolox.com.ar"
     }
   ]
 }</pre></div></div></div></div><div class="panel panel-default"><div class="panel-heading" role="tab" id="heading-users-GET"><h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapse-users-GET" href="#collapse-users-GET">GET /users?page=1&limit=5</a></h4></div><div id="collapse-users-GET" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-users-GET"><div class="panel-body"><h4>Request Data</h4><div class="container"><h5>Headers</h5><pre>{
@@ -59,29 +79,29 @@
   "count": 20,
   "rows": [
     {
-      "firstName": "firstName6",
-      "lastName": "lastName6",
-      "email": "firstLast6@wolox.com.ar"
+      "firstName": "firstName11",
+      "lastName": "lastName11",
+      "email": "firstLast11@wolox.com.ar"
     },
     {
-      "firstName": "firstName7",
-      "lastName": "lastName7",
-      "email": "firstLast7@wolox.com.ar"
+      "firstName": "firstName15",
+      "lastName": "lastName15",
+      "email": "firstLast15@wolox.com.ar"
     },
     {
-      "firstName": "firstName8",
-      "lastName": "lastName8",
-      "email": "firstLast8@wolox.com.ar"
+      "firstName": "firstName20",
+      "lastName": "lastName20",
+      "email": "firstLast20@wolox.com.ar"
     },
     {
-      "firstName": "firstName9",
-      "lastName": "lastName9",
-      "email": "firstLast9@wolox.com.ar"
+      "firstName": "firstName14",
+      "lastName": "lastName14",
+      "email": "firstLast14@wolox.com.ar"
     },
     {
-      "firstName": "firstName10",
-      "lastName": "lastName10",
-      "email": "firstLast10@wolox.com.ar"
+      "firstName": "firstName18",
+      "lastName": "lastName18",
+      "email": "firstLast18@wolox.com.ar"
     }
   ]
 }</pre></div></div></div></div></div></body></html>

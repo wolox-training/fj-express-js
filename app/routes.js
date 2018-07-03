@@ -14,4 +14,5 @@ exports.init = app => {
   app.post('/users/sessions', userFunctions.signIn);
   app.get('/albums', [tokenValidation.validateToken], albumFunctions.getAlbums);
   app.post('/albums/:id', [tokenValidation.validateToken], albumFunctions.purchaseAlbum);
+  app.get('/users/:user_id/albums', [tokenValidation.validateToken], albumFunctions.userAlbums);
 };
