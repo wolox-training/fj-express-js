@@ -28,6 +28,7 @@ exports.getAlbum = route => {
     });
 };
 
+
 exports.getUserAlbums = id => {
   return UserAlbum.getAlbums(id).then(albums => {
     const albumArray = [];
