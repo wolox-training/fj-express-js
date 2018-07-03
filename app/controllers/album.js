@@ -2,7 +2,7 @@
 
 const logger = require('../logger'),
   User = require('../models').user,
-  Album = require('../models').album,
+  UserAlbum = require('../models').useralbum,
   errors = require('../errors'),
   requests = require('../services/albums');
 
@@ -16,36 +16,24 @@ exports.getAlbums = (req, res, next) => {
 };
 
 exports.purchaseAlbum = (req, res, next) => {
+  const albumId = parseInt(req.params.id);
+  if (!albumId) next(errors.albumNotFound('Missing album ID.'));
   requests
-    .getAlbums()
-    .then(response => {
-      const albumId = parseInt(req.params.id);
-      if (!albumId) next(errors.albumNotFound('Missing album ID.'));
-      const album = response.find(element => {
-        return element.id === albumId;
-      });
+    .getAlbum(`/${albumId}`)
+    .then(album => {
       if (album) {
-        Album.FOCAlbum({
-          id: album.id,
-          artistId: album.userId,
-          title: album.title
-        })
-          .spread((dbAlbum, created) => {
-            dbAlbum.getUsers({ where: { email: req.user.email } }).then(owner => {
-              if (owner.length) {
-                next(errors.invalidUser('User has already purchased this album.'));
-              } else {
-                dbAlbum.addUser(req.user);
-                logger.info(
-                  `User ${req.user.firstName} ${req.user.lastName} has successfully purchased album #${
-                    album.id
-                  }`
-                );
-                res.status(201).end();
-              }
-            });
+        UserAlbum.createModel(req.user.id, albumId)
+          .then(() => {
+            logger.info(`User #${req.user.id} bought album #${albumId}`);
+            res.status(201).end();
           })
-          .catch(next);
+          .catch(err => {
+            if (err.message === 'Validation error') {
+              next(errors.invalidUser('User cannot purchase album twice.'));
+            } else {
+              next(err);
+            }
+          });
       } else {
         next(errors.albumNotFound('Requested album does not exist or is not available.'));
       }
