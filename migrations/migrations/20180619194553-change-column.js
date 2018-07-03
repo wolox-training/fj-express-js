@@ -7,5 +7,5 @@ module.exports = {
       after: 'password'
     }),
 
-  down: (queryInterface, Sequelize) => queryInterface.removeColumn('Users', 'isAdmin')
+  down: (queryInterface, Sequelize) => queryInterface.removeColumn('users', 'isAdmin')
 };
