@@ -38,10 +38,10 @@ exports.purchaseAlbum = (req, res, next) => {
 exports.userAlbums = (req, res, next) => {
   const userId = parseInt(req.params.user_id);
   if (req.user.isAdmin || req.user.id === userId) {
-    User.getOneWhere(null, { id: userId })
+    return User.getOneWhere(null, { id: userId })
       .then(user => {
         if (user) {
-          requests
+          return requests
             .getUserAlbums(user.id)
             .then(albums => {
               res.send(albums);
@@ -59,10 +59,10 @@ exports.userAlbums = (req, res, next) => {
 
 exports.getPhotos = (req, res, next) => {
   const albumId = parseInt(req.params.id);
-  UserAlbum.getUserAlbum(req.user.id, albumId)
+  return UserAlbum.getUserAlbum(req.user.id, albumId)
     .then(album => {
       if (album) {
-        requests
+        return requests
           .getAlbumPhotos(album.id)
           .then(photos => res.send(photos))
           .catch(next);

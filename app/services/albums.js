@@ -29,15 +29,11 @@ exports.getAlbum = route => {
 };
 
 exports.getUserAlbums = id => {
-  return UserAlbum.getAlbums(id)
-    .then(albums => {
-      const albumArray = [];
-      albums.forEach(element => albumArray.push(exports.getAlbum(`/${element.albumId}`)));
-      return Promise.all(albumArray);
-    })
-    .catch(err => {
-      throw err;
-    });
+  return UserAlbum.getAlbums(id).then(albums => {
+    const albumArray = [];
+    albums.forEach(element => albumArray.push(exports.getAlbum(`/${element.albumId}`)));
+    return Promise.all(albumArray);
+  });
 };
 
 exports.getAlbumPhotos = id => {
