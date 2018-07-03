@@ -196,10 +196,6 @@ describe('/albums/:id POST', () => {
     });
   });
 
-  after(() => {
-    nock.cleanAll();
-  });
-
   before(() => {
     nock.cleanAll();
     noAlbum(false);
@@ -257,7 +253,7 @@ describe('/albums/:id POST', () => {
     factory.create('user').then(user => {
       chai
         .request(server)
-        .post('/albums/5')
+        .post('/albums/1')
         .set(token.headerName, token.encode({ email: user.email }))
         .then(res => {
           expect(res.status).to.equal(201);
