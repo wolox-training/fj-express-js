@@ -1,5 +1,4 @@
-const logger = require('./logger'),
-  tokenValidation = require('./middlewares/session'),
+const tokenValidation = require('./middlewares/session'),
   userFunctions = require('./controllers/user'),
   albumFunctions = require('./controllers/album');
 
@@ -15,4 +14,5 @@ exports.init = app => {
   app.get('/albums', [tokenValidation.validateToken], albumFunctions.getAlbums);
   app.post('/albums/:id', [tokenValidation.validateToken], albumFunctions.purchaseAlbum);
   app.get('/users/:user_id/albums', [tokenValidation.validateToken], albumFunctions.userAlbums);
+  app.get('/users/albums/:id/photos', [tokenValidation.validateToken], albumFunctions.getPhotos);
 };

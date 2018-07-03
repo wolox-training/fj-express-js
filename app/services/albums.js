@@ -28,8 +28,8 @@ exports.getAlbum = route => {
     });
 };
 
-exports.getUserAlbums = id =>
-  UserAlbum.getAlbums(id)
+exports.getUserAlbums = id => {
+  return UserAlbum.getAlbums(id)
     .then(albums => {
       const albumArray = [];
       albums.forEach(element => albumArray.push(exports.getAlbum(`/${element.albumId}`)));
@@ -38,3 +38,17 @@ exports.getUserAlbums = id =>
     .catch(err => {
       throw err;
     });
+};
+
+exports.getAlbumPhotos = id => {
+  return rp({
+    uri: `https://jsonplaceholder.typicode.com/photos?albumId=${id}`,
+    json: true
+  })
+    .then(response => {
+      return response;
+    })
+    .catch(err => {
+      throw errors.fetchError(err.message);
+    });
+};

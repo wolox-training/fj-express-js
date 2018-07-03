@@ -56,3 +56,19 @@ exports.userAlbums = (req, res, next) => {
     next(errors.invalidUser('User does not have access to other users catalogs'));
   }
 };
+
+exports.getPhotos = (req, res, next) => {
+  const albumId = parseInt(req.params.id);
+  UserAlbum.getUserAlbum(req.user.id, albumId)
+    .then(album => {
+      if (album) {
+        requests
+          .getAlbumPhotos(album.id)
+          .then(photos => res.send(photos))
+          .catch(next);
+      } else {
+        next(errors.invalidUser(`User has not purchased album with id #${albumId}, or it doesn't exist.`));
+      }
+    })
+    .catch(next);
+};
