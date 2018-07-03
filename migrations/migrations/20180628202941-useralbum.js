@@ -12,13 +12,11 @@ module.exports = {
         },
         userId: {
           type: Sequelize.INTEGER,
-          allowNull: false,
-          unique: 'compositeIndex'
+          allowNull: false
         },
         albumId: {
           type: Sequelize.INTEGER,
-          allowNull: false,
-          unique: 'compositeIndex'
+          allowNull: false
         },
         createdAt: {
           allowNull: false,

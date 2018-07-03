@@ -3,6 +3,7 @@
 const logger = require('../logger'),
   User = require('../models').user,
   UserAlbum = require('../models').useralbum,
+  Sequelize = require('sequelize'),
   errors = require('../errors'),
   requests = require('../services/albums');
 
@@ -28,7 +29,7 @@ exports.purchaseAlbum = (req, res, next) => {
             res.status(201).end();
           })
           .catch(err => {
-            if (err.message === 'Validation error') {
+            if (err.message instanceof Sequelize.UniqueConstraintError) {
               next(errors.invalidUser('User cannot purchase album twice.'));
             } else {
               next(err);
