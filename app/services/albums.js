@@ -29,12 +29,8 @@ exports.getAlbum = route => {
 };
 
 exports.getUserAlbums = id =>
-  UserAlbum.getAlbums(id)
-    .then(albums => {
-      const albumArray = [];
-      albums.forEach(element => albumArray.push(exports.getAlbum(`/${element.albumId}`)));
-      return Promise.all(albumArray);
-    })
-    .catch(err => {
-      throw err;
-    });
+  UserAlbum.getAlbums(id).then(albums => {
+    const albumArray = [];
+    albums.forEach(element => albumArray.push(exports.getAlbum(`/${element.albumId}`)));
+    return Promise.all(albumArray);
+  });
