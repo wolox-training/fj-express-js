@@ -59,10 +59,10 @@ const oneAlbum = persist => {
     });
 };
 
-const noAlbum = persist => {
+const noAlbum = (persist, num) => {
   const success = nock('https://jsonplaceholder.typicode.com')
     .persist(persist)
-    .get('/albums/101')
+    .get(`/albums/${num}`)
     .reply(404, {});
 };
 
@@ -144,6 +144,7 @@ describe('/albums GET', () => {
 describe('/albums/:id POST', () => {
   afterEach(() => {
     factory.cleanUp();
+    nock.cleanAll();
   });
 
   it('should fail because session has no token', done => {
@@ -176,8 +177,7 @@ describe('/albums/:id POST', () => {
   });
 
   before(() => {
-    nock.cleanAll();
-    noAlbum();
+    noAlbum(true, 101);
   });
 
   it('should fail because external service is unavailable', done => {
@@ -197,8 +197,7 @@ describe('/albums/:id POST', () => {
   });
 
   before(() => {
-    nock.cleanAll();
-    noAlbum(false);
+    noAlbum(false, 101);
   });
 
   it('should fail because external album does not exist', done => {
@@ -218,7 +217,6 @@ describe('/albums/:id POST', () => {
   });
 
   before(() => {
-    nock.cleanAll();
     oneAlbum();
   });
 
@@ -263,6 +261,134 @@ describe('/albums/:id POST', () => {
             done();
           });
         });
+    });
+  });
+});
+
+describe('/users/:user_id/albums GET', () => {
+  afterEach(() => {
+    factory.cleanUp();
+    nock.cleanAll();
+  });
+
+  it('should fail because session has no token', done => {
+    chai
+      .request(server)
+      .get('/users/1/albums')
+      .catch(err => {
+        err.should.have.status(401);
+        err.response.body.should.have.property('message');
+        err.response.body.should.have.property('internal_code');
+        expect(err.response.body.message).to.equal('Missing token.');
+        expect(err.response.body.internal_code).to.equal('invalid_token');
+        done();
+      });
+  });
+
+  it('should fail because token is invalid', done => {
+    chai
+      .request(server)
+      .get('/users/1/albums')
+      .set(token.headerName, token.encode({ email: 'all your base belong to us' }))
+      .catch(err => {
+        err.should.have.status(401);
+        err.response.body.should.have.property('message');
+        err.response.body.should.have.property('internal_code');
+        expect(err.response.body.message).to.equal('Invalid token.');
+        expect(err.response.body.internal_code).to.equal('invalid_token');
+        done();
+      });
+  });
+
+  it('should fail because user is not an administrator', done => {
+    factory.createMany('user', 2).then(newUsers => {
+      chai
+        .request(server)
+        .get(`/users/${newUsers[0].id}/albums`)
+        .set(token.headerName, token.encode({ email: newUsers[1].email }))
+        .catch(err => {
+          err.should.have.status(400);
+          err.response.body.should.have.property('message');
+          err.response.body.should.have.property('internal_code');
+          expect(err.response.body.message).to.equal('User does not have access to other users catalogs');
+          expect(err.response.body.internal_code).to.equal('invalid_user');
+          done();
+        });
+    });
+  });
+
+  before(() => {
+    oneAlbum(false);
+  });
+
+  it('should fail because external service broke', done => {
+    factory.create('user').then(user => {
+      chai
+        .request(server)
+        .post('/albums/1')
+        .set(token.headerName, token.encode({ email: user.email }))
+        .then(() => {
+          noAlbum(false, 1);
+          chai
+            .request(server)
+            .get('/users/1/albums')
+            .set(token.headerName, token.encode({ email: user.email }))
+            .catch(err => {
+              err.should.have.status(404);
+              err.response.body.should.have.property('message');
+              err.response.body.should.have.property('internal_code');
+              expect(err.response.body.internal_code).to.equal('fetch_error');
+              done();
+            });
+        });
+    });
+  });
+
+  before(() => {
+    oneAlbum();
+  });
+
+  it('should succeed', done => {
+    factory.create('user').then(user => {
+      chai
+        .request(server)
+        .post('/albums/1')
+        .set(token.headerName, token.encode({ email: user.email }))
+        .then(() => {
+          chai
+            .request(server)
+            .get('/users/1/albums')
+            .set(token.headerName, token.encode({ email: user.email }))
+            .then(res => {
+              res.should.have.status(200);
+              expect(res.body).to.eql([{ userId: 1, id: 1, title: 'quidem molestiae enim' }]);
+              dictum.chai(res);
+              done();
+            });
+        });
+    });
+  });
+
+  it('should succeed (admin)', done => {
+    factory.create('admin').then(admin => {
+      factory.create('user').then(user => {
+        chai
+          .request(server)
+          .post('/albums/1')
+          .set(token.headerName, token.encode({ email: user.email }))
+          .then(() => {
+            chai
+              .request(server)
+              .get(`/users/${user.id}/albums`)
+              .set(token.headerName, token.encode({ email: admin.email }))
+              .then(res => {
+                res.should.have.status(200);
+                expect(res.body).to.eql([{ userId: 1, id: 1, title: 'quidem molestiae enim' }]);
+                dictum.chai(res);
+                done();
+              });
+          });
+      });
     });
   });
 });
