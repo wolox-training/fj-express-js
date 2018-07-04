@@ -4,7 +4,6 @@ const rp = require('request-promise'),
   UserAlbum = require('../models').useralbum;
 
 exports.getAlbums = () => {
-  console.log(config.common.url);
   return rp({
     uri: `${config.common.url}/albums`,
     json: true
