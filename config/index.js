@@ -52,7 +52,8 @@ const config = {
       environment: process.env.ROLLBAR_ENV
     },
     port: process.env.PORT,
-    url: process.env.JURL
+    url: process.env.EXTERNAL_URL,
+    expiration: process.env.TOKEN_EXPIRATION_TIME || 1
   }
 };
 

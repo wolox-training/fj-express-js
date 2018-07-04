@@ -247,9 +247,7 @@ describe('/users/sessions POST', () => {
       .then(res => {
         expect(res.header).to.have.property('authorization');
         const auth = token.encode(userObject.email);
-        expect(token.decode(res.header.authorization)).to.eql({
-          email: 'email@wolox.com.ar'
-        });
+        expect(token.decode(res.header.authorization).email).to.equal('email@wolox.com.ar');
         expect(res.status).to.equal(200);
         dictum.chai(res);
         done();
@@ -433,6 +431,28 @@ describe('/admin/users POST', () => {
             done();
           });
         });
+    });
+  });
+});
+
+describe('token expiry', () => {
+  it('should fail because token expired', done => {
+    factory.create('user').then(user => {
+      const tk = token.encode({ email: user.email });
+      setTimeout(() => {
+        chai
+          .request(server)
+          .get('/users')
+          .set(token.headerName, tk)
+          .catch(err => {
+            err.should.have.status(401);
+            err.response.body.should.have.property('message');
+            err.response.body.should.have.property('internal_code');
+            expect(err.response.body.message).to.equal('Token expired');
+            expect(err.response.body.internal_code).to.equal('invalid_token');
+            done();
+          });
+      }, 2000);
     });
   });
 });
