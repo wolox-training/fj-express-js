@@ -6,17 +6,18 @@ const chai = require('chai'),
   nock = require('nock'),
   token = require('../app/services/tokenSessions'),
   UserAlbum = require('../app/models').useralbum,
+  config = require('./../config'),
   should = chai.should(),
   expect = require('chai').expect;
 
 const albums404 = () => {
-  nock('https://jsonplaceholder.typicode.com')
+  nock(`${config.common.url}`)
     .get('/albums')
     .reply(404, {});
 };
 
 const albumSuccess = persist => {
-  const success = nock('https://jsonplaceholder.typicode.com')
+  const success = nock(`${config.common.url}`)
     .persist(persist)
     .get('/albums')
     .reply(200, [
@@ -49,7 +50,7 @@ const albumSuccess = persist => {
 };
 
 const oneAlbum = persist => {
-  const success = nock('https://jsonplaceholder.typicode.com')
+  const success = nock(`${config.common.url}`)
     .persist(persist)
     .get('/albums/1')
     .reply(200, {
@@ -60,14 +61,14 @@ const oneAlbum = persist => {
 };
 
 const noAlbum = (persist, num) => {
-  const success = nock('https://jsonplaceholder.typicode.com')
+  const success = nock(`${config.common.url}`)
     .persist(persist)
     .get(`/albums/${num}`)
     .reply(404, {});
 };
 
 const onePhoto = (persist, id) => {
-  const success = nock('https://jsonplaceholder.typicode.com')
+  const success = nock(`${config.common.url}`)
     .persist(persist)
     .get(`/album/${id}/photos`)
     .reply(200, [
@@ -96,7 +97,7 @@ const onePhoto = (persist, id) => {
 };
 
 const noPhoto = (persist, id) => {
-  const success = nock('https://jsonplaceholder.typicode.com')
+  const success = nock(`${config.common.url}`)
     .persist(persist)
     .get(`/album/${id}/photos`)
     .reply(404, {});

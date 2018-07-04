@@ -7,6 +7,7 @@ sudo: true
 
 env:
   - CXX=g++-4.8
+  - JURL=https://jsonplaceholder.typicode.com
 addons:
   apt:
     sources:

@@ -87,7 +87,7 @@ module.exports = (sequelize, DataTypes) => {
       attributes: ['firstName', 'lastName', 'email'],
       offset,
       limit,
-      order: sequelize.col('email')
+      order: [['email', 'ASC']]
     }).catch(err => {
       throw errors.databaseError(err.message);
     });

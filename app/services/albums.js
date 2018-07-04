@@ -1,10 +1,12 @@
 const rp = require('request-promise'),
   errors = require('../errors'),
+  config = require('./../../config'),
   UserAlbum = require('../models').useralbum;
 
 exports.getAlbums = () => {
+  console.log(config.common.url);
   return rp({
-    uri: `https://jsonplaceholder.typicode.com/albums`,
+    uri: `${config.common.url}/albums`,
     json: true
   })
     .then(response => {
@@ -17,7 +19,7 @@ exports.getAlbums = () => {
 
 exports.getAlbum = route => {
   return rp({
-    uri: `https://jsonplaceholder.typicode.com/albums${route}`,
+    uri: `${config.common.url}/albums${route}`,
     json: true
   })
     .then(response => {
@@ -38,7 +40,7 @@ exports.getUserAlbums = id => {
 
 exports.getAlbumPhotos = id => {
   return rp({
-    uri: `https://jsonplaceholder.typicode.com/album/${id}/photos`,
+    uri: `${config.common.url}/album/${id}/photos`,
     json: true
   })
     .then(response => {
