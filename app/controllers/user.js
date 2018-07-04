@@ -74,7 +74,7 @@ exports.signIn = (req, res, next) => {
               const auth = tokens.encode({ email: dbUser.email });
               res.status(200);
               res.set(tokens.headerName, auth);
-              res.send(`This token will expire in ${time} minutes.`);
+              res.send({ expirationTime: time });
             } else {
               next(errors.invalidUser('The email/password combination you entered is invalid.'));
             }
