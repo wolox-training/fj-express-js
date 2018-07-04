@@ -6,7 +6,8 @@ const logger = require('../logger'),
   bcrypt = require('bcryptjs'),
   errors = require('../errors'),
   User = require('../models').user,
-  saltRounds = 10;
+  saltRounds = 10,
+  time = require('./../../config').common.expiration;
 
 const newUserObject = body => {
   const newUser = body
@@ -73,7 +74,7 @@ exports.signIn = (req, res, next) => {
               const auth = tokens.encode({ email: dbUser.email });
               res.status(200);
               res.set(tokens.headerName, auth);
-              res.end();
+              res.send(`This token will expire in ${time} minutes.`);
             } else {
               next(errors.invalidUser('The email/password combination you entered is invalid.'));
             }
