@@ -3,8 +3,8 @@ const rp = require('request-promise'),
   config = require('./../../config'),
   UserAlbum = require('../models').useralbum;
 
-exports.getAlbums = () => {
-  return rp({
+exports.getAlbums = () =>
+  rp({
     uri: `${config.common.url}/albums`,
     json: true
   })
@@ -14,10 +14,9 @@ exports.getAlbums = () => {
     .catch(err => {
       throw errors.fetchError(err.message);
     });
-};
 
-exports.getAlbum = route => {
-  return rp({
+exports.getAlbum = route =>
+  rp({
     uri: `${config.common.url}/albums${route}`,
     json: true
   })
@@ -27,18 +26,16 @@ exports.getAlbum = route => {
     .catch(err => {
       throw errors.fetchError(err.message);
     });
-};
 
-exports.getUserAlbums = id => {
-  return UserAlbum.getAlbums(id).then(albums => {
+exports.getUserAlbums = id =>
+  UserAlbum.getAlbums(id).then(albums => {
     const albumArray = [];
     albums.forEach(element => albumArray.push(exports.getAlbum(`/${element.albumId}`)));
     return Promise.all(albumArray);
   });
-};
 
-exports.getAlbumPhotos = id => {
-  return rp({
+exports.getAlbumPhotos = id =>
+  rp({
     uri: `${config.common.url}/album/${id}/photos`,
     json: true
   })
@@ -48,4 +45,3 @@ exports.getAlbumPhotos = id => {
     .catch(err => {
       throw errors.fetchError(err.message);
     });
-};

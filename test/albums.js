@@ -490,24 +490,20 @@ describe('/users/albums/:id/photos GET', () => {
 
   it('should fail because external service broke', done => {
     factory.create('user').then(user => {
-      chai
-        .request(server)
-        .post('/albums/1')
-        .set(token.headerName, token.encode({ email: user.email }))
-        .then(() => {
-          noPhoto(true, 1);
-          chai
-            .request(server)
-            .get('/users/albums/1/photos')
-            .set(token.headerName, token.encode({ email: user.email }))
-            .catch(err => {
-              err.should.have.status(404);
-              err.response.body.should.have.property('message');
-              err.response.body.should.have.property('internal_code');
-              expect(err.response.body.internal_code).to.equal('fetch_error');
-              done();
-            });
-        });
+      factory.create('useralbum').then(() => {
+        noPhoto(true, 1);
+        chai
+          .request(server)
+          .get('/users/albums/1/photos')
+          .set(token.headerName, token.encode({ email: user.email }))
+          .catch(err => {
+            err.should.have.status(404);
+            err.response.body.should.have.property('message');
+            err.response.body.should.have.property('internal_code');
+            expect(err.response.body.internal_code).to.equal('fetch_error');
+            done();
+          });
+      });
     });
   });
 
@@ -517,23 +513,19 @@ describe('/users/albums/:id/photos GET', () => {
 
   it('should succeed', done => {
     factory.create('user').then(user => {
-      chai
-        .request(server)
-        .post('/albums/1')
-        .set(token.headerName, token.encode({ email: user.email }))
-        .then(() => {
-          onePhoto(true, 1);
-          chai
-            .request(server)
-            .get('/users/albums/1/photos')
-            .set(token.headerName, token.encode({ email: user.email }))
-            .then(res => {
-              res.should.have.status(200);
-              expect(res.body.length).to.equal(3);
-              dictum.chai(res);
-              done();
-            });
-        });
+      factory.create('useralbum').then(() => {
+        onePhoto(true, 1);
+        chai
+          .request(server)
+          .get('/users/albums/1/photos')
+          .set(token.headerName, token.encode({ email: user.email }))
+          .then(res => {
+            res.should.have.status(200);
+            expect(res.body.length).to.equal(3);
+            dictum.chai(res);
+            done();
+          });
+      });
     });
   });
 });
