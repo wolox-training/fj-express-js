@@ -6,17 +6,18 @@ const chai = require('chai'),
   nock = require('nock'),
   token = require('../app/services/tokenSessions'),
   UserAlbum = require('../app/models').useralbum,
+  config = require('./../config'),
   should = chai.should(),
   expect = require('chai').expect;
 
 const albums404 = () => {
-  nock('https://jsonplaceholder.typicode.com')
+  nock(`${config.common.url}`)
     .get('/albums')
     .reply(404, {});
 };
 
 const albumSuccess = persist => {
-  const success = nock('https://jsonplaceholder.typicode.com')
+  const success = nock(`${config.common.url}`)
     .persist(persist)
     .get('/albums')
     .reply(200, [
@@ -49,7 +50,7 @@ const albumSuccess = persist => {
 };
 
 const oneAlbum = persist => {
-  const success = nock('https://jsonplaceholder.typicode.com')
+  const success = nock(`${config.common.url}`)
     .persist(persist)
     .get('/albums/1')
     .reply(200, {
@@ -60,9 +61,45 @@ const oneAlbum = persist => {
 };
 
 const noAlbum = (persist, num) => {
-  const success = nock('https://jsonplaceholder.typicode.com')
+  const success = nock(`${config.common.url}`)
     .persist(persist)
     .get(`/albums/${num}`)
+    .reply(404, {});
+};
+
+const onePhoto = (persist, id) => {
+  const success = nock(`${config.common.url}`)
+    .persist(persist)
+    .get(`/album/${id}/photos`)
+    .reply(200, [
+      {
+        albumId: 1,
+        id: 1,
+        title: 'accusamus beatae ad facilis cum similique qui sunt',
+        url: 'http://placehold.it/600/92c952',
+        thumbnailUrl: 'http://placehold.it/150/92c952'
+      },
+      {
+        albumId: 1,
+        id: 2,
+        title: 'reprehenderit est deserunt velit ipsam',
+        url: 'http://placehold.it/600/771796',
+        thumbnailUrl: 'http://placehold.it/150/771796'
+      },
+      {
+        albumId: 1,
+        id: 3,
+        title: 'officia porro iure quia iusto qui ipsa ut modi',
+        url: 'http://placehold.it/600/24f355',
+        thumbnailUrl: 'http://placehold.it/150/24f355'
+      }
+    ]);
+};
+
+const noPhoto = (persist, id) => {
+  const success = nock(`${config.common.url}`)
+    .persist(persist)
+    .get(`/album/${id}/photos`)
     .reply(404, {});
 };
 
@@ -387,6 +424,106 @@ describe('/users/:user_id/albums GET', () => {
                 dictum.chai(res);
                 done();
               });
+          });
+      });
+    });
+  });
+});
+
+describe('/users/albums/:id/photos GET', () => {
+  afterEach(() => {
+    factory.cleanUp();
+    nock.cleanAll();
+  });
+
+  it('should fail because session has no token', done => {
+    chai
+      .request(server)
+      .get('/users/albums/1/photos')
+      .catch(err => {
+        err.should.have.status(401);
+        err.response.body.should.have.property('message');
+        err.response.body.should.have.property('internal_code');
+        expect(err.response.body.message).to.equal('Missing token.');
+        expect(err.response.body.internal_code).to.equal('invalid_token');
+        done();
+      });
+  });
+
+  it('should fail because token is invalid', done => {
+    chai
+      .request(server)
+      .get('/users/albums/1/photos')
+      .set(token.headerName, token.encode({ email: 'all your base belong to us' }))
+      .catch(err => {
+        err.should.have.status(401);
+        err.response.body.should.have.property('message');
+        err.response.body.should.have.property('internal_code');
+        expect(err.response.body.message).to.equal('Invalid token.');
+        expect(err.response.body.internal_code).to.equal('invalid_token');
+        done();
+      });
+  });
+
+  it('should fail because user does not own album', done => {
+    factory.create('user').then(user => {
+      chai
+        .request(server)
+        .get('/users/albums/1/photos')
+        .set(token.headerName, token.encode({ email: user.email }))
+        .catch(err => {
+          err.should.have.status(400);
+          err.response.body.should.have.property('message');
+          err.response.body.should.have.property('internal_code');
+          expect(err.response.body.message).to.equal(
+            `User has not purchased album with id #1, or it doesn't exist.`
+          );
+          expect(err.response.body.internal_code).to.equal('invalid_user');
+          done();
+        });
+    });
+  });
+
+  before(() => {
+    oneAlbum(false);
+  });
+
+  it('should fail because external service broke', done => {
+    factory.create('user').then(user => {
+      factory.create('useralbum').then(() => {
+        noPhoto(true, 1);
+        chai
+          .request(server)
+          .get('/users/albums/1/photos')
+          .set(token.headerName, token.encode({ email: user.email }))
+          .catch(err => {
+            err.should.have.status(404);
+            err.response.body.should.have.property('message');
+            err.response.body.should.have.property('internal_code');
+            expect(err.response.body.internal_code).to.equal('fetch_error');
+            done();
+          });
+      });
+    });
+  });
+
+  before(() => {
+    oneAlbum(false);
+  });
+
+  it('should succeed', done => {
+    factory.create('user').then(user => {
+      factory.create('useralbum').then(() => {
+        onePhoto(true, 1);
+        chai
+          .request(server)
+          .get('/users/albums/1/photos')
+          .set(token.headerName, token.encode({ email: user.email }))
+          .then(res => {
+            res.should.have.status(200);
+            expect(res.body.length).to.equal(3);
+            dictum.chai(res);
+            done();
           });
       });
     });

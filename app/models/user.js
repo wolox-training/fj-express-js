@@ -86,7 +86,8 @@ module.exports = (sequelize, DataTypes) => {
     User.findAndCountAll({
       attributes: ['firstName', 'lastName', 'email'],
       offset,
-      limit
+      limit,
+      order: [['email', 'ASC']]
     }).catch(err => {
       throw errors.databaseError(err.message);
     });
