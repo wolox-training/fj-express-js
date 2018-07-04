@@ -448,7 +448,7 @@ describe('token expiry', () => {
             err.should.have.status(401);
             err.response.body.should.have.property('message');
             err.response.body.should.have.property('internal_code');
-            expect(err.response.body.message).to.equal('Token is expired.');
+            expect(err.response.body.message).to.equal('Token expired');
             expect(err.response.body.internal_code).to.equal('invalid_token');
             done();
           });

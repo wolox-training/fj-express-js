@@ -19,7 +19,7 @@ exports.validateToken = (req, res, next) => {
         })
         .catch(next);
     } catch (err) {
-      next(errors.invalidToken('Token is expired.'));
+      next(errors.invalidToken(err.message));
     }
   } else {
     next(errors.invalidToken('Missing token.'));
