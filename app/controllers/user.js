@@ -97,10 +97,9 @@ exports.listUsers = (req, res, next) => {
     .catch(next);
 };
 
-exports.invalidateAll = (req, res, next) => {
+exports.invalidateAll = (req, res, next) =>
   User.logout(req.user.id)
     .then(() => {
       res.send('Logged out successfully');
     })
     .catch(next);
-};

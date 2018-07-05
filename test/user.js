@@ -15,6 +15,28 @@ const chaiPost = (path, object) =>
     .post(path)
     .send(object);
 
+const validToken = (path, tk) =>
+  chai
+    .request(server)
+    .get(path)
+    .set(token.headerName, tk)
+    .then(res => {
+      res.should.have.status(200);
+    });
+
+const logoutToken = (path, tk) =>
+  chai
+    .request(server)
+    .get(path)
+    .set(token.headerName, tk)
+    .catch(err => {
+      err.should.have.status(401);
+      err.response.body.should.have.property('message');
+      err.response.body.should.have.property('internal_code');
+      expect(err.response.body.message).to.equal('Invalid token.');
+      expect(err.response.body.internal_code).to.equal('invalid_token');
+    });
+
 describe('/users POST', () => {
   it('should fail because first name is missing', done => {
     chai
@@ -461,25 +483,27 @@ describe('/users/sessions/invalidate_all POST', () => {
   it('should fail because user logged out', done => {
     factory.create('user').then(user => {
       const tk = token.encode({ email: user.email });
-      chai
-        .request(server)
-        .post('/users/sessions/invalidate_all')
-        .set(token.headerName, tk)
-        .then(() => {
-          logger.info('User logged out.');
-          chai
-            .request(server)
-            .get('/users')
-            .set(token.headerName, tk)
-            .catch(err => {
-              err.should.have.status(401);
-              err.response.body.should.have.property('message');
-              err.response.body.should.have.property('internal_code');
-              expect(err.response.body.message).to.equal('Invalid token.');
-              expect(err.response.body.internal_code).to.equal('invalid_token');
+      const tk2 = token.encode({ email: user.email });
+      const tk3 = token.encode({ email: user.email });
+      const validTokens = [];
+      validTokens.push(logoutToken('/users', tk));
+      validTokens.push(logoutToken('/users', tk2));
+      validTokens.push(logoutToken('/users', tk3));
+      Promise.all(validTokens).then(() => {
+        chai
+          .request(server)
+          .post('/users/sessions/invalidate_all')
+          .set(token.headerName, tk)
+          .then(() => {
+            const expiredTokens = [];
+            expiredTokens.push(logoutToken('/users', tk));
+            expiredTokens.push(logoutToken('/users', tk2));
+            expiredTokens.push(logoutToken('/users', tk3));
+            Promise.all(expiredTokens).then(eTokens => {
               done();
             });
-        });
+          });
+      });
     });
   });
 });
