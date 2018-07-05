@@ -22,7 +22,16 @@ const validToken = (path, tk) =>
     .set(token.headerName, tk)
     .then(res => {
       res.should.have.status(200);
+      logger.info('VALID TOKEN!');
     });
+
+const acquireToken = email =>
+  chaiPost('/users/sessions', {
+    email,
+    password: 'password'
+  }).then(res => {
+    return res.header.authorization;
+  });
 
 const logoutToken = (path, tk) =>
   chai
@@ -35,6 +44,7 @@ const logoutToken = (path, tk) =>
       err.response.body.should.have.property('internal_code');
       expect(err.response.body.message).to.equal('Invalid token.');
       expect(err.response.body.internal_code).to.equal('invalid_token');
+      logger.info('INVALID TOKEN!');
     });
 
 describe('/users POST', () => {
@@ -482,27 +492,30 @@ describe('token expiry', () => {
 describe('/users/sessions/invalidate_all POST', () => {
   it('should fail because user logged out', done => {
     factory.create('user').then(user => {
-      const tk = token.encode({ email: user.email });
-      const tk2 = token.encode({ email: user.email });
-      const tk3 = token.encode({ email: user.email });
-      const validTokens = [];
-      validTokens.push(logoutToken('/users', tk));
-      validTokens.push(logoutToken('/users', tk2));
-      validTokens.push(logoutToken('/users', tk3));
-      Promise.all(validTokens).then(() => {
-        chai
-          .request(server)
-          .post('/users/sessions/invalidate_all')
-          .set(token.headerName, tk)
-          .then(() => {
-            const expiredTokens = [];
-            expiredTokens.push(logoutToken('/users', tk));
-            expiredTokens.push(logoutToken('/users', tk2));
-            expiredTokens.push(logoutToken('/users', tk3));
-            Promise.all(expiredTokens).then(eTokens => {
-              done();
+      const tokens = [];
+      tokens.push(acquireToken(user.email));
+      tokens.push(acquireToken(user.email));
+      tokens.push(acquireToken(user.email));
+      Promise.all(tokens).then(newTokens => {
+        const validTokens = [];
+        for (let i = 0; i < 3; i++) {
+          validTokens.push(validToken('/users', newTokens[i]));
+        }
+        Promise.all(validTokens).then(() => {
+          chai
+            .request(server)
+            .post('/users/sessions/invalidate_all')
+            .set(token.headerName, newTokens[0])
+            .then(() => {
+              const expiredTokens = [];
+              for (let i = 0; i < 3; i++) {
+                expiredTokens.push(logoutToken('/users', newTokens[i]));
+              }
+              Promise.all(expiredTokens).then(() => {
+                done();
+              });
             });
-          });
+        });
       });
     });
   });
