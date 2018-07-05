@@ -22,7 +22,6 @@ const validToken = (path, tk) =>
     .set(token.headerName, tk)
     .then(res => {
       res.should.have.status(200);
-      logger.info('VALID TOKEN!');
     });
 
 const acquireToken = email =>
@@ -44,7 +43,6 @@ const logoutToken = (path, tk) =>
       err.response.body.should.have.property('internal_code');
       expect(err.response.body.message).to.equal('Invalid token.');
       expect(err.response.body.internal_code).to.equal('invalid_token');
-      logger.info('INVALID TOKEN!');
     });
 
 describe('/users POST', () => {
@@ -491,16 +489,17 @@ describe('token expiry', () => {
 
 describe('/users/sessions/invalidate_all POST', () => {
   it('should fail because user logged out', done => {
+    const tokenNum = 4;
     factory.create('user').then(user => {
       const tokens = [];
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < tokenNum; i++) {
         tokens.push(acquireToken(user.email));
       }
       Promise.all(tokens).then(newTokens => {
         const validTokens = [];
-        for (let i = 0; i < 3; i++) {
-          validTokens.push(validToken('/users', newTokens[i]));
-        }
+        newTokens.forEach(tk => {
+          validTokens.push(validToken('/users', tk));
+        });
         Promise.all(validTokens).then(() => {
           chai
             .request(server)
@@ -508,9 +507,9 @@ describe('/users/sessions/invalidate_all POST', () => {
             .set(token.headerName, newTokens[0])
             .then(() => {
               const expiredTokens = [];
-              for (let i = 0; i < 3; i++) {
-                expiredTokens.push(logoutToken('/users', newTokens[i]));
-              }
+              newTokens.forEach(tk => {
+                validTokens.push(logoutToken('/users', tk));
+              });
               Promise.all(expiredTokens).then(() => {
                 done();
               });

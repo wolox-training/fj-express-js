@@ -58,9 +58,9 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     logoutDate: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DATE(6),
       allowNull: false,
-      defaultValue: Math.round(Date.now() / 1000)
+      defaultValue: DataTypes.NOW
     }
   });
 
@@ -103,7 +103,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
   User.logout = id =>
-    User.update({ logoutDate: Math.round(Date.now() / 1000) }, { where: { id } }).catch(err => {
+    User.update({ logoutDate: sequelize.NOW }, { where: { id } }).catch(err => {
       throw errors.savingError(err.message);
     });
 
