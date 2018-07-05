@@ -493,9 +493,9 @@ describe('/users/sessions/invalidate_all POST', () => {
   it('should fail because user logged out', done => {
     factory.create('user').then(user => {
       const tokens = [];
-      tokens.push(acquireToken(user.email));
-      tokens.push(acquireToken(user.email));
-      tokens.push(acquireToken(user.email));
+      for (let i = 0; i < 3; i++) {
+        tokens.push(acquireToken(user.email));
+      }
       Promise.all(tokens).then(newTokens => {
         const validTokens = [];
         for (let i = 0; i < 3; i++) {
