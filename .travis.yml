@@ -18,5 +18,5 @@ services:
   - postgresql
 
 before_script:
-  - psql -c "CREATE DATABASE travis;" -U postgres
+  - psql -c "CREATE DATABASE travis2;" -U postgres
   - node_modules/.bin/sequelize db:migrate

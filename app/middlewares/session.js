@@ -11,8 +11,13 @@ exports.validateToken = (req, res, next) => {
       User.findOne({ where: { email: payload.email } })
         .then(dbUser => {
           if (dbUser) {
-            req.user = dbUser;
-            next();
+            const logout = Math.round(Date.parse(dbUser.logoutDate) / 1000);
+            if (payload.iat >= logout) {
+              req.user = dbUser;
+              next();
+            } else {
+              next(errors.invalidToken('Invalid token.'));
+            }
           } else {
             next(errors.invalidToken('Invalid token.'));
           }

@@ -56,6 +56,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false
+    },
+    logoutDate: {
+      type: DataTypes.DATE(6),
+      allowNull: false,
+      defaultValue: DataTypes.NOW
     }
   });
 
@@ -94,6 +99,11 @@ module.exports = (sequelize, DataTypes) => {
 
   User.upsertUser = object =>
     User.upsert(object).catch(err => {
+      throw errors.savingError(err.message);
+    });
+
+  User.logout = id =>
+    User.update({ logoutDate: sequelize.NOW }, { where: { id } }).catch(err => {
       throw errors.savingError(err.message);
     });
 

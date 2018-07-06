@@ -15,6 +15,36 @@ const chaiPost = (path, object) =>
     .post(path)
     .send(object);
 
+const validToken = (path, tk) =>
+  chai
+    .request(server)
+    .get(path)
+    .set(token.headerName, tk)
+    .then(res => {
+      res.should.have.status(200);
+    });
+
+const acquireToken = email =>
+  chaiPost('/users/sessions', {
+    email,
+    password: 'password'
+  }).then(res => {
+    return res.header.authorization;
+  });
+
+const logoutToken = (path, tk) =>
+  chai
+    .request(server)
+    .get(path)
+    .set(token.headerName, tk)
+    .catch(err => {
+      err.should.have.status(401);
+      err.response.body.should.have.property('message');
+      err.response.body.should.have.property('internal_code');
+      expect(err.response.body.message).to.equal('Invalid token.');
+      expect(err.response.body.internal_code).to.equal('invalid_token');
+    });
+
 describe('/users POST', () => {
   it('should fail because first name is missing', done => {
     chai
@@ -453,6 +483,39 @@ describe('token expiry', () => {
             done();
           });
       }, 2000);
+    });
+  });
+});
+
+describe('/users/sessions/invalidate_all POST', () => {
+  it('should fail because user logged out', done => {
+    const tokenNum = 4;
+    factory.create('user').then(user => {
+      const tokens = [];
+      for (let i = 0; i < tokenNum; i++) {
+        tokens.push(acquireToken(user.email));
+      }
+      Promise.all(tokens).then(newTokens => {
+        const validTokens = [];
+        newTokens.forEach(tk => {
+          validTokens.push(validToken('/users', tk));
+        });
+        Promise.all(validTokens).then(() => {
+          chai
+            .request(server)
+            .post('/users/sessions/invalidate_all')
+            .set(token.headerName, newTokens[0])
+            .then(() => {
+              const expiredTokens = [];
+              newTokens.forEach(tk => {
+                validTokens.push(logoutToken('/users', tk));
+              });
+              Promise.all(expiredTokens).then(() => {
+                done();
+              });
+            });
+        });
+      });
     });
   });
 });
